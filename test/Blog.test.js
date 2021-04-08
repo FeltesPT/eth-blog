@@ -37,6 +37,7 @@ contract('Blog', () => {
 
   it('lists articles', async () => {
     const articleCount = await this.blog.articleCount()
+    assert.equal(articleCount, 1, "[We don't have one Article on the array]")
     const article = await this.blog.articles(0)
 
     assert.equal(article.id.toNumber(), 0, "[Wrong article ID]")
