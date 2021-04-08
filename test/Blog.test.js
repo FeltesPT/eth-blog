@@ -10,9 +10,11 @@ const articlesFromJSON = (json) => {
       articles.push({
         id: json[0][i],
         date: json[1][i],
-        content: json[2][i],
-        author: json[3][i],
-        published: json[4][i]
+        title: json[2][i],
+        imageUrl: json[3][i],
+        content: json[4][i],
+        author: json[5][i],
+        published: json[6][i]
       })
     }
   }
@@ -35,10 +37,13 @@ contract('Blog', () => {
 
   it('lists articles', async () => {
     const articleCount = await this.blog.articleCount()
-    const article = await this.blog.articles(articleCount-1)
+    const article = await this.blog.articles(0)
+
     assert.equal(article.id.toNumber(), 0, "[Wrong article ID]")
     assert.notEqual(article.date.toNumber(), null, "[Wrong article date]")
-    assert.equal(article.content, "My first blog article", "[Wrong article Content]")
+    assert.equal(article.title, "My first blog's title.", "[Wrong article Title]")
+    assert.equal(article.imageUrl, "https://www.epiccode.dev/img/iconBlackLogo.cd7fd92e.png", "[Wrong article Image URL]")
+    assert.equal(article.content, "My first blog article content!", "[Wrong article Content]")
     assert.equal(web3.utils.hexToUtf8(article.author), "Tiago Dias", "[Wrong article Author]")
     assert.equal(article.published, false, "[Wrong article Published Status]")
   })
@@ -50,7 +55,9 @@ contract('Blog', () => {
 
     assert.equal(article.id.toNumber(), 0, "[Wrong article ID]")
     assert.notEqual(article.date.toNumber(), null, "[Wrong article date]")
-    assert.equal(article.content, "My first blog article", "[Wrong article Content]")
+    assert.equal(article.title, "My first blog's title.", "[Wrong article Title]")
+    assert.equal(article.imageUrl, "https://www.epiccode.dev/img/iconBlackLogo.cd7fd92e.png", "[Wrong article Image URL]")
+    assert.equal(article.content, "My first blog article content!", "[Wrong article Content]")
     assert.equal(web3.utils.hexToUtf8(article.author), "Tiago Dias", "[Wrong article Author]")
     assert.equal(article.published, false, "[Wrong article Published Status]")
   })
@@ -59,8 +66,10 @@ contract('Blog', () => {
     var articlesJSON = await this.blog.getArticles()
     var articles = articlesFromJSON(articlesJSON)
     assert.equal(articles.length, 1, "[We don't have one Article on the array]")
+
+    const imageUrl = "https://pbs.twimg.com/profile_images/3009631723/ecb2d2bf2a3213878f37f9d523a580af.jpeg"
     
-    const result = await this.blog.createArticle("A secondary article", web3.utils.utf8ToHex("Another Author"))
+    const result = await this.blog.createArticle("A secondary title", imageUrl ,"A secondary article", web3.utils.utf8ToHex("Another Author"))
     
     articlesJSON = await this.blog.getArticles()
     assert.equal(articlesJSON[0].length, 2, "[We don't have two Article on the array]")
@@ -68,6 +77,8 @@ contract('Blog', () => {
     const event = result.logs[0].args
     assert.equal(event.id.toNumber(), 1, "[Wrong article ID]")
     assert.notEqual(event.date.toNumber(), null, "[Wrong article date]")
+    assert.equal(event.title, "A secondary title", "[Wrong article Title]")
+    assert.equal(event.imageUrl, imageUrl, "[Wrong article Image URL]")
     assert.equal(event.content, "A secondary article", "[Wrong article Content]")
     assert.equal(web3.utils.hexToUtf8(event.author), "Another Author", "[Wrong article Author]")
     assert.equal(event.published, false, "[Wrong article Published Status]")

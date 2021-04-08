@@ -5,6 +5,8 @@ contract Blog {
   struct Article {
     uint16 id;
     uint date;
+    string title;
+    string imageUrl;
     string content;
     bytes32 author;
     bool published;
@@ -17,6 +19,8 @@ contract Blog {
   event ArticleCreated(
     uint16 id,
     uint date,
+    string title,
+    string imageUrl,
     string content,
     bytes32 author,
     bool published
@@ -29,12 +33,12 @@ contract Blog {
   );
 
   constructor() public {
-    createArticle("My first blog article", bytes32("Tiago Dias"));
+    createArticle("My first blog's title.", "https://www.epiccode.dev/img/iconBlackLogo.cd7fd92e.png" ,"My first blog article content!", bytes32("Tiago Dias"));
   }
 
-  function createArticle(string memory _content, bytes32 _author) public {
-    articles[articleCount] = Article(articleCount, block.timestamp, _content, _author, false);
-    emit ArticleCreated(articleCount, articles[articleCount].date, _content, _author, false);
+  function createArticle(string memory _title, string memory _imageUrl, string memory _content, bytes32 _author) public {
+    articles[articleCount] = Article(articleCount, block.timestamp, _title, _imageUrl, _content, _author, false);
+    emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageUrl, _content, _author, false);
     articleCount++;
   }
 
@@ -45,12 +49,16 @@ contract Blog {
       uint16[] memory,
       uint[] memory,
       string[] memory,
+      string[] memory,
+      string[] memory,
       bytes32[] memory,
       bool[] memory
     ) {
 
       uint16[] memory ids = new uint16[](articleCount);
       uint[] memory dates = new uint[](articleCount);
+      string[] memory titles = new string[](articleCount);
+      string[] memory imageUrls = new string[](articleCount);
       string[] memory contents = new string[](articleCount);
       bytes32[] memory authors = new bytes32[](articleCount);
       bool[] memory publisheds = new bool[](articleCount);
@@ -58,12 +66,14 @@ contract Blog {
       for(uint i = 0; i < articleCount; i++) {
         ids[i] = articles[i].id;
         dates[i] = articles[i].date;
+        titles[i] = articles[i].title;
+        imageUrls[i] = articles[i].imageUrl;
         contents[i] = articles[i].content;
         authors[i] = articles[i].author;
         publisheds[i] = articles[i].published;
       }
 
-      return (ids, dates, contents, authors, publisheds);
+      return (ids, dates, titles, imageUrls, contents, authors, publisheds);
   }
 
   function togglePublished(uint16 _id) external articleExists(_id) {
