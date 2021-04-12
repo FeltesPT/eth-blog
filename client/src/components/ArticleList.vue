@@ -1,0 +1,107 @@
+<template>
+  <div class="hello flex-col items-center justify-center container mx-auto">
+    <h1>Your address is:</h1>
+    <p>{{ address }}</p>
+    <p>We have {{ count }} {{count > 1 ? "articles" : "article"}}</p>
+    <p>Articles: </p>
+    <div class="flex mx-auto">
+      <div v-for="article in articles" :key="article.id">
+        <router-link :to="{ name: 'Details', params: { id: article.id }}">
+          <figure class="md:flex bg-gray-100 rounded-xl p-8 md:p-0">
+            <img class="w-32 h-32 md:w-48 md:h-auto md:rounded-none rounded-full mx-auto" :src="article.imageUrl" alt="" width="384" height="512">
+            <div class="pt-6 md:p-8 text-center md:text-left space-y-4">
+              <p class="text-lg">
+                {{ article.title }}
+              </p>
+              <p class="text-lg font-semibold">
+                {{ article.content }}
+              </p>
+              <figcaption class="font-medium">
+                <div class="text-blue-500">
+                  {{ article.author }}
+                </div>
+                <div class="text-gray-500">
+                  {{ article.published ? "Yes" : "No" }}
+                </div>
+              </figcaption>
+            </div>
+          </figure>
+        </router-link>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapActions } from "vuex";
+import Article from '../store/models/Article'
+export default {
+  name: "Article List",
+  data() {
+    return {
+      count: 0,
+      articles: [Article]
+    }
+  },
+  computed: {
+    address: function() { return this.$store.getters.accountAddress },
+    contract: function() { return this.$store.getters.contract },
+  },
+  mounted() {
+    this.count = 0
+    this.articles = []
+    this.load()
+  },
+  methods: {
+    ...mapActions(["LoadWeb3", "LoadContracts","GetAddress"]),
+    async load() {
+      await this.LoadWeb3()
+      await this.LoadContracts()
+      await this.GetAddress()
+      await this.getCount()
+      await this.getArticles()
+    },
+    async getCount() {
+      const count = await this.$store.getters.contract.articleCount()
+      this.count = count.toNumber()
+    },
+    async getArticles() {
+      const json = await this.$store.getters.contract.getArticles()
+      
+      this.articles = []
+      for (let i of json[0]) {
+        const article = new Article([
+          json[0][i],
+          json[1][i],
+          json[2][i],
+          json[3][i],
+          json[4][i],
+          json[5][i],
+          json[6][i]
+        ])
+
+        this.articles.push(article)
+      }
+      
+    }
+  },
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+h3 {
+  margin: 40px 0 0;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+a {
+  color: #42b983;
+}
+</style>

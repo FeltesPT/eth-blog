@@ -2,15 +2,11 @@
   "name": "eth-blog",
   "version": "1.0.0",
   "description": "Epic Code Blog Powered By Ethereum",
-  "main": "truffle-config.js",
-  "directories": {
-    "test": "test"
-  },
+  "author": "tiago@epiccode.dev",
   "scripts": {
     "test": "echo \"Error: no test specified\" && sexit 1"
   },
-  "author": "tiago@epiccode.dev",
-  "license": "ISC",
+  "main": "truffle-config.js",
   "devDependencies": {
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
@@ -18,5 +14,9 @@
     "truffle": "5.0.2",
     "truffle-contract": "4.0.31",
     "web3": "^1.3.4"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "license": "ISC"
 }
