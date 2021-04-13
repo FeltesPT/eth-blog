@@ -1,6 +1,11 @@
 <template>
   <div class="flex-col items-center justify-center container mx-auto">
     <h1>New Article:</h1>
+    <div>
+      <button type="button" @click="$router.go(-1)" class="bg-blue-400 text-white px-6 py-1">
+        <span class="text-lg">Back</span>
+      </button>
+    </div>
     <div class="flex flex-col">
       <label class="py-2 text-left" for="title">Title</label>
       <input
@@ -44,6 +49,30 @@
         Submit
       </button>
     </div>
+    <div v-if="showError"
+      class="flex justify-between items-center bg-red-200 relative text-red-600 py-3 px-3 rounded-lg">
+      <div>
+          <span class="font-semibold text-red-700">Error!</span>
+          Failed to save article! Please try again or contact a system admin.
+      </div>
+      <div>
+        <button type="button" @click="showError = false" class=" text-red-700">
+          <span class="text-2xl">&times;</span>
+        </button>
+      </div>
+    </div>
+    <div v-if="showSuccess"
+      class="flex justify-between items-center bg-green-200 relative text-green-600 py-3 px-3 rounded-lg">
+      <div>
+          <span class="font-semibold text-green-700">Success!</span>
+          Article saved successfully!
+      </div>
+      <div>
+        <button type="button" @click="showSuccess = false" class=" text-green-700">
+          <span class="text-2xl">&times;</span>
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -57,7 +86,9 @@ export default {
       imageUrl: "",
       content: "",
       author: "",
-      loading: true
+      loading: true,
+      showSuccess: false,
+      showError: false
     }
   },
   computed: {
@@ -80,9 +111,17 @@ export default {
     async submit() {
       this.loading = true
       console.log("Save")
-      const article = await this.$store.getters.contract.createArticle(this.title, this.imageUrl ,this.content, window.web3.utils.utf8ToHex(this.author), {from: this.address})
+      const result = await this.$store.getters.contract.createArticle(this.title, this.imageUrl ,this.content, window.web3.utils.utf8ToHex(this.author), {from: this.address})
+
+      const article = result.logs[0].args
 
       console.log(article)
+
+      if (article) {
+        this.showSuccess = true
+      } else {
+        this.showError = true
+      }
       
       this.loading = false
     }

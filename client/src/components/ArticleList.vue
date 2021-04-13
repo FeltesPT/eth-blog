@@ -4,16 +4,15 @@
     <p>{{ address }}</p>
     <p>We have {{ count }} {{count > 1 ? "articles" : "article"}}</p>
     <p>Articles: </p>
-    <div class="flex mx-auto">
+    <div class="flex-col mx-auto">
       <div v-for="article in articles" :key="article.id">
         <router-link :to="{ name: 'Details', params: { id: article.id }}">
-          <figure class="md:flex bg-gray-100 rounded-xl p-8 md:p-0">
-            <img class="w-32 h-32 md:w-48 md:h-auto md:rounded-none rounded-full mx-auto" :src="article.imageUrl" alt="" width="384" height="512">
-            <div class="pt-6 md:p-8 text-center md:text-left space-y-4">
+          <figure class="flex justify-between py-10">
+            <div class="flex-col pt-6 md:p-8 text-center md:text-left space-y-4 p-8">
               <p class="text-lg">
                 {{ article.title }}
               </p>
-              <p class="text-lg font-semibold">
+              <p class="text-lg font-semibold max-h-6 overflow-ellipsis overflow-hidden">
                 {{ article.content }}
               </p>
               <figcaption class="font-medium">
@@ -25,6 +24,7 @@
                 </div>
               </figcaption>
             </div>
+            <img class="flex float-right" :src="article.imageUrl" alt="" width="384" height="512">
           </figure>
         </router-link>
       </div>
