@@ -4,4 +4,6 @@ Very basic Blog running on Ethereum
 
 Build with Solidy.
 
-FrontEnd will be React or Vue (TBD)
+FrontEnd in Vue.
+
+![](https://github.com/FeltesPT/eth-blog/blob/master/blog.gif)
