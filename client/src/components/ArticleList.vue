@@ -3,6 +3,11 @@
     <h1>Your address is:</h1>
     <p>{{ address }}</p>
     <p>We have {{ count }} {{count > 1 ? "articles" : "article"}}</p>
+    <div>
+      <button type="button" @click="$router.push({ path: 'create' })" class="bg-blue-400 text-white px-6 py-1">
+        <span class="text-lg">Create</span>
+      </button>
+    </div>
     <p>Articles: </p>
     <div class="flex-col mx-auto">
       <div v-for="article in articles" :key="article.id">
