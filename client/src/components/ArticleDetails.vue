@@ -41,9 +41,8 @@ export default {
     this.load()
   },
   methods: {
-    ...mapActions(["LoadWeb3", "LoadContracts","GetAddress"]),
+    ...mapActions(["LoadContracts","GetAddress"]),
     async load() {
-      await this.LoadWeb3()
       await this.LoadContracts()
       await this.getArticle()
     },

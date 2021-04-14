@@ -77,6 +77,7 @@
 </template>
 
 <script>
+import { ethers } from 'ethers';
 import { mapActions } from "vuex";
 export default {
   name: "Article List",
@@ -100,9 +101,8 @@ export default {
     this.load()
   },
   methods: {
-    ...mapActions(["LoadWeb3", "LoadContracts", "GetAddress"]),
+    ...mapActions(["LoadContracts", "GetAddress"]),
     async load() {
-      await this.LoadWeb3()
       await this.GetAddress()
       await this.LoadContracts()
 
@@ -111,13 +111,11 @@ export default {
     async submit() {
       this.loading = true
       console.log("Save")
-      const result = await this.$store.getters.contract.createArticle(this.title, this.imageUrl ,this.content, window.web3.utils.utf8ToHex(this.author), {from: this.address})
+      const txResponse = await this.$store.getters.contract.createArticle(this.title, this.imageUrl ,this.content, ethers.utils.formatBytes32String(this.author))
 
-      const article = result.logs[0].args
+      const result = await txResponse.wait();
 
-      console.log(article)
-
-      if (article) {
+      if (result.status == 1) {
         this.showSuccess = true
       } else {
         this.showError = true

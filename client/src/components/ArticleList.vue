@@ -2,13 +2,16 @@
   <div class="hello flex-col items-center justify-center container mx-auto">
     <h1>Your address is:</h1>
     <p>{{ address }}</p>
+    <h3>Your balance is:</h3>
+    <p>{{ ethBalance }} ETH</p>
+    <h3>Articles:</h3>
     <p>We have {{ count }} {{count > 1 ? "articles" : "article"}}</p>
     <div>
       <button type="button" @click="$router.push({ path: 'create' })" class="bg-blue-400 text-white px-6 py-1">
         <span class="text-lg">Create</span>
       </button>
     </div>
-    <p>Articles: </p>
+    <p class="mt-10">List: </p>
     <div class="flex-col mx-auto">
       <div v-for="article in articles" :key="article.id">
         <router-link :to="{ name: 'Details', params: { id: article.id }}">
@@ -50,6 +53,7 @@ export default {
   },
   computed: {
     address: function() { return this.$store.getters.accountAddress },
+    ethBalance: function() { return this.$store.getters.accountEthBalance },
     contract: function() { return this.$store.getters.contract },
   },
   mounted() {
@@ -58,17 +62,15 @@ export default {
     this.load()
   },
   methods: {
-    ...mapActions(["LoadWeb3", "LoadContracts","GetAddress"]),
+    ...mapActions(["LoadContracts","GetAddress"]),
     async load() {
-      await this.LoadWeb3()
       await this.LoadContracts()
       await this.GetAddress()
       await this.getCount()
       await this.getArticles()
     },
     async getCount() {
-      const count = await this.$store.getters.contract.articleCount()
-      this.count = count.toNumber()
+      this.count = await this.$store.getters.contract.articleCount()
     },
     async getArticles() {
       const json = await this.$store.getters.contract.getArticles()
