@@ -12,7 +12,7 @@ contract Blog {
     uint16 id;
     uint date;
     string title;
-    string imageUrl;
+    string imageHash;
     string content;
     address author;
     bool published;
@@ -36,7 +36,7 @@ contract Blog {
     uint16 id,
     uint date,
     string title,
-    string imageUrl,
+    string imageHash,
     string content,
     address author,
     bool published
@@ -50,7 +50,12 @@ contract Blog {
 
   constructor() {
     createUser("Tiago Dias", msg.sender);
-    createArticle("My first blog's title.", "https://www.epiccode.dev/img/iconBlackLogo.cd7fd92e.png" ,"My first blog article content!", msg.sender);
+    createArticle(
+      "My first blog's title.",
+      "QmQpmL2kW6YfTmGwmN82AqNUAh7rbp6rTj3QDBaAsrWgcm",
+      "My first blog article content!",
+      msg.sender
+    );
   }
 
   function createUser(bytes32 _name, address _wallet_address) public {
@@ -84,7 +89,7 @@ contract Blog {
       uint16[] memory ids = new uint16[](articleCount);
       uint[] memory dates = new uint[](articleCount);
       string[] memory titles = new string[](articleCount);
-      string[] memory imageUrls = new string[](articleCount);
+      string[] memory imageHashes = new string[](articleCount);
       string[] memory contents = new string[](articleCount);
       address[] memory authors = new address[](articleCount);
       bool[] memory publisheds = new bool[](articleCount);
@@ -93,13 +98,13 @@ contract Blog {
         ids[i] = articles[i].id;
         dates[i] = articles[i].date;
         titles[i] = articles[i].title;
-        imageUrls[i] = articles[i].imageUrl;
+        imageHashes[i] = articles[i].imageHash;
         contents[i] = articles[i].content;
         authors[i] = articles[i].author;
         publisheds[i] = articles[i].published;
       }
 
-      return (ids, dates, titles, imageUrls, contents, authors, publisheds);
+      return (ids, dates, titles, imageHashes, contents, authors, publisheds);
   }
 
   function togglePublished(uint16 _id) external articleExists(_id) {
