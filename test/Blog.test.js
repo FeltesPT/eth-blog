@@ -16,7 +16,8 @@ const articlesFromJSON = (json) => {
         imageHash: json[3][i],
         content: json[4][i],
         author: json[5][i],
-        published: json[6][i]
+        published: json[6][i],
+        tips: json[7][i]
       })
     }
   }
@@ -65,6 +66,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(article.imageHash, imageHash, "[Wrong article Image Hash]")
       assert.equal(article.content, "My first blog article content!", "[Wrong article Content]")
       assert.equal(article.published, false, "[Wrong article Published Status]")
+      assert.equal(article.tips, 0, "[Wrong Tips amoung]")
 
       const article_user = await this.blog.users(article.author);
       assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
@@ -82,6 +84,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(article.imageHash, imageHash, "[Wrong article Image Hash]")
       assert.equal(article.content, "My first blog article content!", "[Wrong article Content]")
       assert.equal(article.published, false, "[Wrong article Published Status]")
+      assert.equal(article.tips, 0, "[Wrong Tips amoung]")
 
       const article_user = await this.blog.users(article.author);
       assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
@@ -107,6 +110,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(event.imageHash, imageHash, "[Wrong article Image Hash]")
       assert.equal(event.content, "A secondary article", "[Wrong article Content]")
       assert.equal(event.published, false, "[Wrong article Published Status]")
+      assert.equal(event.tips, 0, "[Wrong Tips amoung]")
 
       const article_user = await this.blog.users(article.author);
       assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
@@ -131,7 +135,24 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(event.published, true, "[Wrong article Published Status]")
     })
 
-    
+    it('tip article', async () => {
+      const tipAmount = web3.utils.toWei('0.1', 'Ether')
+      
+      let article = await this.blog.articles(0)
+      assert.equal(article.tips, 0, "[Article shouldnt have any tips]")
+
+      await this.blog.tipArticle(article.id, { from: author1 , value: tipAmount })
+
+      article = await this.blog.articles(0)
+      assert.equal(article.tips, tipAmount, "[Should have 0.1 ether]")
+
+      const _deployer = await this.blog.users(deployer)
+      assert.equal(web3.utils.BN(_deployer.tips_received), tipAmount, "[Should have 0.1 ether]")
+
+      const _author1 = await this.blog.users(author1)
+      assert.equal(web3.utils.BN(_author1.tips_sent), tipAmount, "[Should have 0.1 ether]")
+    })
+
   })
-  
+
 })
