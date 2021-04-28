@@ -60,7 +60,7 @@ contract('Blog', () => {
     assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
   })
 
-  xit('lists articles with getArticles()', async () => {
+  it('lists articles with getArticles()', async () => {
     const articlesJSON = await this.blog.getArticles()
     const articles = articlesFromJSON(articlesJSON)
     const article = articles[0]
@@ -70,18 +70,22 @@ contract('Blog', () => {
     assert.equal(article.title, "My first blog's title.", "[Wrong article Title]")
     assert.equal(article.imageUrl, "https://www.epiccode.dev/img/iconBlackLogo.cd7fd92e.png", "[Wrong article Image URL]")
     assert.equal(article.content, "My first blog article content!", "[Wrong article Content]")
-    assert.equal(web3.utils.hexToUtf8(article.author), "Tiago Dias", "[Wrong article Author]")
     assert.equal(article.published, false, "[Wrong article Published Status]")
+
+    const article_user = await this.blog.users(article.author);
+    assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
+    assert.equal(article_user.wallet_address, article.author, "[Wrong article Author]")
   })
 
-  xit('creates article', async () => {
+  it('creates article', async () => {
     var articlesJSON = await this.blog.getArticles()
     var articles = articlesFromJSON(articlesJSON)
     assert.equal(articles.length, 1, "[We don't have one Article on the array]")
 
     const imageUrl = "https://pbs.twimg.com/profile_images/3009631723/ecb2d2bf2a3213878f37f9d523a580af.jpeg"
-    
-    const result = await this.blog.createArticle("A secondary title", imageUrl ,"A secondary article", web3.utils.utf8ToHex("Another Author"))
+
+    const article = articles[0]
+    const result = await this.blog.createArticle("A secondary title", imageUrl , "A secondary article", article.author)
     
     articlesJSON = await this.blog.getArticles()
     assert.equal(articlesJSON[0].length, 2, "[We don't have two Article on the array]")
@@ -92,11 +96,14 @@ contract('Blog', () => {
     assert.equal(event.title, "A secondary title", "[Wrong article Title]")
     assert.equal(event.imageUrl, imageUrl, "[Wrong article Image URL]")
     assert.equal(event.content, "A secondary article", "[Wrong article Content]")
-    assert.equal(web3.utils.hexToUtf8(event.author), "Another Author", "[Wrong article Author]")
     assert.equal(event.published, false, "[Wrong article Published Status]")
+
+    const article_user = await this.blog.users(article.author);
+    assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
+    assert.equal(article_user.wallet_address, article.author, "[Wrong article Author]")
   })
 
-  xit('toggles article publish', async () => {
+  it('toggles article publish', async () => {
     const article = await this.blog.articles(0)
     assert.equal(article.published, false, "[Wrong article Published Status]")
 

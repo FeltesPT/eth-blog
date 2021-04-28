@@ -104,6 +104,9 @@ contract Blog {
 
   function togglePublished(uint16 _id) external articleExists(_id) {
     Article storage _article = articles[_id];
+
+    require(msg.sender == _article.author);
+
     _article.published = !_article.published;
     _article.date = block.timestamp;
     emit ArticlePublished(_article.id, _article.date, _article.published);
