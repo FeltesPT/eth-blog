@@ -1,20 +1,36 @@
-pragma solidity ^0.5.16;
-pragma experimental ABIEncoderV2;
+pragma solidity ^0.8.4;
 
 contract Blog {
+  struct User {
+    bytes32 name;
+    address wallet_address;
+    uint16 tips_received;
+    uint16 tips_sent;
+  }
+
   struct Article {
     uint16 id;
     uint date;
     string title;
     string imageUrl;
     string content;
-    bytes32 author;
+    address author;
     bool published;
   }
 
   uint16 public articleCount = 0;
+  Article[] public articles;
 
-  mapping(uint => Article) public articles;
+  mapping(address => User) public users;
+  mapping(uint => address) public articleToUser;
+  mapping(address => uint) public userArticlesCount;
+
+   event UserCreated(
+    bytes32 name,
+    address wallet_address,
+    uint16 tips_received,
+    uint16 tips_sent
+  );
 
   event ArticleCreated(
     uint16 id,
@@ -22,7 +38,7 @@ contract Blog {
     string title,
     string imageUrl,
     string content,
-    bytes32 author,
+    address author,
     bool published
   );
 
@@ -32,12 +48,22 @@ contract Blog {
     bool published
   );
 
-  constructor() public {
-    createArticle("My first blog's title.", "https://www.epiccode.dev/img/iconBlackLogo.cd7fd92e.png" ,"My first blog article content!", bytes32("Tiago Dias"));
+  constructor() {
+    createUser("Tiago Dias", msg.sender);
+    createArticle("My first blog's title.", "https://www.epiccode.dev/img/iconBlackLogo.cd7fd92e.png" ,"My first blog article content!", msg.sender);
   }
 
-  function createArticle(string memory _title, string memory _imageUrl, string memory _content, bytes32 _author) public {
-    articles[articleCount] = Article(articleCount, block.timestamp, _title, _imageUrl, _content, _author, false);
+  function createUser(bytes32 _name, address _wallet_address) public {
+    users[_wallet_address] = User(_name, _wallet_address, 0, 0);
+    emit UserCreated(_name, _wallet_address, 0, 0);
+  }
+
+  function createArticle(string memory _title, string memory _imageUrl, string memory _content, address _author) public {
+    articles.push(Article(articleCount, block.timestamp, _title, _imageUrl, _content, _author, false));
+    
+    articleToUser[articleCount] = msg.sender;
+    userArticlesCount[msg.sender] = userArticlesCount[msg.sender] + 1;
+
     emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageUrl, _content, _author, false);
     articleCount++;
   }
@@ -51,7 +77,7 @@ contract Blog {
       string[] memory,
       string[] memory,
       string[] memory,
-      bytes32[] memory,
+      address[] memory,
       bool[] memory
     ) {
 
@@ -60,7 +86,7 @@ contract Blog {
       string[] memory titles = new string[](articleCount);
       string[] memory imageUrls = new string[](articleCount);
       string[] memory contents = new string[](articleCount);
-      bytes32[] memory authors = new bytes32[](articleCount);
+      address[] memory authors = new address[](articleCount);
       bool[] memory publisheds = new bool[](articleCount);
 
       for(uint i = 0; i < articleCount; i++) {

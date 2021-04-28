@@ -7,11 +7,13 @@ module.exports = {
       network_id: "*" // Match any network id
     }
   },
-  solc: {
-    version: "^0.5.16",
-    optimizer: {
-      enabled: true,
-      runs: 200
+  compilers: {
+    solc: {
+      version: "^0.8.4",
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
     }
   }
 }
