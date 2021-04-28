@@ -107,11 +107,8 @@ contract Blog {
       return (ids, dates, titles, imageHashes, contents, authors, publisheds);
   }
 
-  function togglePublished(uint16 _id) external articleExists(_id) {
+  function togglePublished(uint16 _id) external articleExists(_id) isOwner(_id) {
     Article storage _article = articles[_id];
-
-    require(msg.sender == _article.author);
-
     _article.published = !_article.published;
     _article.date = block.timestamp;
     emit ArticlePublished(_article.id, _article.date, _article.published);
@@ -119,6 +116,13 @@ contract Blog {
 
   modifier articleExists(uint16 _id) {
     if(articles[_id].date == 0) {
+      revert();
+    }
+    _;
+  }
+
+  modifier isOwner(uint16 _id) {
+    if (articles[_id].author != msg.sender) {
       revert();
     }
     _;

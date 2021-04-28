@@ -1,6 +1,8 @@
-const { assert } = require('chai')
-
 const Blog = artifacts.require('./Blog.sol')
+
+require('chai')
+  .use(require('chai-as-promised'))
+  .should()
 
 const articlesFromJSON = (json) => {
   const articles = []
@@ -22,7 +24,7 @@ const articlesFromJSON = (json) => {
   return articles
 }
 
-contract('Blog', () => {
+contract('Blog', ([deployer, author1, author2]) => {
 
   before(async () => {
     this.blog = await Blog.deployed()
@@ -45,6 +47,7 @@ contract('Blog', () => {
       const article = await this.blog.articles(0)
       const user = await this.blog.users(article.author);
       assert.equal(web3.utils.hexToUtf8(user.name), "Tiago Dias", "[User is not correct]")
+      assert.equal(user.wallet_address, deployer, "[User is not correct]")
     })
 
   })
@@ -65,6 +68,7 @@ contract('Blog', () => {
 
       const article_user = await this.blog.users(article.author);
       assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
+      assert.equal(article_user.wallet_address, deployer, "[User is not correct]")
     })
 
     it('lists articles with getArticles()', async () => {
@@ -82,6 +86,7 @@ contract('Blog', () => {
       const article_user = await this.blog.users(article.author);
       assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
       assert.equal(article_user.wallet_address, article.author, "[Wrong article Author]")
+      assert.equal(article_user.wallet_address, deployer, "[Wrong article Author]")
     })
 
     it('creates article', async () => {
@@ -106,17 +111,27 @@ contract('Blog', () => {
       const article_user = await this.blog.users(article.author);
       assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
       assert.equal(article_user.wallet_address, article.author, "[Wrong article Author]")
+      assert.equal(article_user.wallet_address, deployer, "[User is not correct]")
+    })
+    
+    it('toggles article publish fails', async () => {
+      const article = await this.blog.articles(0)
+      assert.equal(article.published, false, "[Wrong article Published Status]")
+
+      const result = await this.blog.togglePublished(0, { from: author1 }).should.be.rejected;
     })
 
     it('toggles article publish', async () => {
       const article = await this.blog.articles(0)
       assert.equal(article.published, false, "[Wrong article Published Status]")
 
-      const result = await this.blog.togglePublished(0)
+      const result = await this.blog.togglePublished(0, { from: deployer })
       const event = result.logs[0].args
       assert.equal(event.id.toNumber(), 0, "[Wrong article ID]")
       assert.equal(event.published, true, "[Wrong article Published Status]")
     })
+
+    
   })
   
 })
