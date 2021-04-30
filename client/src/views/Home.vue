@@ -1,5 +1,5 @@
 <template>
-  <ArticleList v-if="user"/>
+  <ArticleList v-if="user.name"/>
   <CreateUser v-else />
 </template>
 
@@ -14,13 +14,10 @@ export default {
     ArticleList,
     CreateUser
   },
-  data() {
-    return {
-      user: null
-    }
-  },
   computed: {
-
+    user: function() { 
+      return this.$store.getters.user
+    },
   },
   mounted() {
     this.user = null,

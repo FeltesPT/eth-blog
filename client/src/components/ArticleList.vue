@@ -1,7 +1,7 @@
 <template>
   <div class="hello flex-col items-center justify-center container mx-auto">
     <h1>Your address is:</h1>
-    <p>{{ address }}</p>
+    <p>{{ user.wallet_address }}</p>
     <h3>Your balance is:</h3>
     <p>{{ ethBalance }} ETH</p>
     <h3>Articles:</h3>
@@ -25,14 +25,14 @@
               </p>
               <figcaption class="font-medium">
                 <div class="text-blue-500">
-                  {{ article.author }}
+                  {{ article.authorName }}
                 </div>
                 <div class="text-gray-500">
                   {{ article.published ? "Yes" : "No" }}
                 </div>
               </figcaption>
             </div>
-            <img class="flex float-right" :src="article.imageUrl" alt="" width="384" height="512">
+            <img class="flex float-right" :src="'https://ipfs.infura.io/ipfs/' + article.imageUrl" alt="" width="384" height="512">
           </figure>
         </router-link>
       </div>
@@ -42,54 +42,26 @@
 
 <script>
 import { mapActions } from "vuex"
-import Article from '../store/models/Article'
 export default {
   name: "Article List",
-  data() {
-    return {
-      count: 0,
-      articles: [Article]
-    }
-  },
   computed: {
-    address: function() { return this.$store.getters.accountAddress },
-    ethBalance: function() { return this.$store.getters.accountEthBalance },
-    contract: function() { return this.$store.getters.contract },
+    user () { return this.$store.getters.user },
+    ethBalance () { return this.$store.getters.accountEthBalance },
+    contract () { return this.$store.getters.contract },
+    articles () { return this.$store.getters.articles },
+    count () { return this.articles ? this.articles.length : 0 },
   },
   mounted() {
     this.count = 0
-    this.articles = []
     this.load()
   },
   methods: {
-    ...mapActions(["LoadContracts","GetAddress"]),
+    ...mapActions(["LoadContracts","GetAddress", 'GetArticles']),
     async load() {
+      await this.LoadContracts()
       await this.GetAddress()
-      await this.getCount()
-      await this.getArticles()
+      await this.GetArticles()
     },
-    async getCount() {
-      this.count = await this.$store.getters.contract.articleCount()
-    },
-    async getArticles() {
-      const json = await this.$store.getters.contract.getArticles()
-      
-      this.articles = []
-      for (let i of json[0]) {
-        const article = new Article([
-          json[0][i],
-          json[1][i],
-          json[2][i],
-          json[3][i],
-          json[4][i],
-          json[5][i],
-          json[6][i]
-        ])
-
-        this.articles.push(article)
-      }
-      
-    }
   },
 };
 </script>
