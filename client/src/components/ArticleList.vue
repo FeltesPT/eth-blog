@@ -27,6 +27,9 @@
                 <div class="text-blue-500">
                   {{ article.authorName }}
                 </div>
+                <div class="text-blue-500">
+                  Tips Received: {{ article.tips.toNumber() }}
+                </div>
                 <div class="text-gray-500">
                   {{ article.published ? "Yes" : "No" }}
                 </div>

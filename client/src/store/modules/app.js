@@ -35,7 +35,8 @@ const actions = {
             articles[3][i],
             articles[4][i],
             articles[5][i],
-            articles[6][i]
+            articles[6][i],
+            articles[7][i]
           ])
 
           const author = await contract.users(article.author)
