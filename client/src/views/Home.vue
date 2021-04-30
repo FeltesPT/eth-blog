@@ -5,8 +5,8 @@
 
 <script>
 import { mapActions } from "vuex";
-import ArticleList from '../components/ArticleList.vue'
-import CreateUser from '../components/CreateUser.vue'
+import ArticleList from './Article/List.vue'
+import CreateUser from './User/Create.vue'
 
 export default {
   name: 'App',

@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import ArticleCreate from '../components/ArticleCreate.vue'
+import ArticleCreate from '../../components/ArticleCreate.vue'
 
 export default {
   name: 'App',

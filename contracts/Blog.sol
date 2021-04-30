@@ -52,7 +52,7 @@ contract Blog {
   );
 
   constructor() {
-    createUser("Tiago Dias", msg.sender);
+    createUser("Tiago Dias");
     createArticle(
       "My first blog's title.",
       "QmQpmL2kW6YfTmGwmN82AqNUAh7rbp6rTj3QDBaAsrWgcm",
@@ -62,9 +62,9 @@ contract Blog {
   }
 
   // User Methods
-  function createUser(bytes32 _name, address _wallet_address) public {
-    users[_wallet_address] = User(_name, _wallet_address, 0, 0);
-    emit UserCreated(_name, _wallet_address, 0, 0);
+  function createUser(bytes32 _name) public {
+    users[msg.sender] = User(_name, msg.sender, 0, 0);
+    emit UserCreated(_name, msg.sender, 0, 0);
   }
 
   // Article Methods

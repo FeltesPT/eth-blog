@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import Article from '../views/Article.vue';
-import Create from '../views/Create.vue';
+import Details from '../views/Article/Details.vue';
+import Create from '../views/Article/Create.vue';
 import Layout from '../views/Layout.vue';
 
 const routes = [
@@ -19,7 +19,7 @@ const routes = [
           {
               path: ':id',
               name: 'Details',
-              component: Article,
+              component: Details,
               // meta: { requiresAuth: true },
               meta: { guest: true, title: 'Epic Code - About' },
           },

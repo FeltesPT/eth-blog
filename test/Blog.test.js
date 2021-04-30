@@ -57,7 +57,7 @@ contract('Blog', ([deployer, author1, author2]) => {
 
   describe('Users', async () => {
     it('create user', async () => {
-      const result = await this.blog.createUser(web3.utils.utf8ToHex("Author 1"), author1)
+      const result = await this.blog.createUser(web3.utils.stringToHex("Author 1"), { from: author1 })
       const event = result.logs[0].args
 
       assert.equal(web3.utils.hexToUtf8(event.name), "Author 1", ['Wrong name on user create'])
@@ -186,7 +186,7 @@ contract('Blog', ([deployer, author1, author2]) => {
     })
 
     it('Create article after user is created', async () => {
-      await this.blog.createUser(web3.utils.utf8ToHex("Author 2"), author2)
+      await this.blog.createUser(web3.utils.stringToHex("Author 2"), { from: author2 })
       const result = await this.blog.createArticle("Title", imageHash, "Amazing Content", author2)
       const event = result.logs[0].args
       
