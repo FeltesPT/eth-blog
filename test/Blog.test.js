@@ -1,3 +1,5 @@
+const { assert } = require('chai')
+
 const Blog = artifacts.require('./Blog.sol')
 
 require('chai')
@@ -52,7 +54,25 @@ contract('Blog', ([deployer, author1, author2]) => {
     })
 
   })
-  describe('Articles ', async () => {
+
+  describe('Users', async () => {
+    it('create user', async () => {
+      const result = await this.blog.createUser(web3.utils.utf8ToHex("Author 1"), author1)
+      const event = result.logs[0].args
+
+      assert.equal(web3.utils.hexToUtf8(event.name), "Author 1", ['Wrong name on user create'])
+      assert.equal(event.wallet_address, author1, ['Wrong Address on user create'])
+      assert.equal(event.tips_received, 0, ['Wrong Address on user create'])
+      assert.equal(event.tips_sent, 0, ['Wrong Address on user create'])
+    })
+
+    it('Gets user', async () => {
+      const user = await this.blog.users(deployer)
+      assert.equal(web3.utils.hexToUtf8(user.name), "Tiago Dias", ['Wrong name on user create'])
+    })
+  })
+
+  describe('Articles', async () => {
     const imageHash = 'QmQpmL2kW6YfTmGwmN82AqNUAh7rbp6rTj3QDBaAsrWgcm' // Wolf
 
     it('lists articles', async () => {
@@ -98,7 +118,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(articles.length, 1, "[We don't have one Article on the array]")
 
       const article = articles[0]
-      const result = await this.blog.createArticle("A secondary title", imageHash , "A secondary article", article.author)
+      const result = await this.blog.createArticle("A secondary title", imageHash , "A secondary article", deployer)
       
       articlesJSON = await this.blog.getArticles()
       assert.equal(articlesJSON[0].length, 2, "[We don't have two Article on the array]")
@@ -112,7 +132,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(event.published, false, "[Wrong article Published Status]")
       assert.equal(event.tips, 0, "[Wrong Tips amoung]")
 
-      const article_user = await this.blog.users(article.author);
+      const article_user = await this.blog.users(article.author)
       assert.equal(web3.utils.hexToUtf8(article_user.name), "Tiago Dias", "[Wrong article Author]")
       assert.equal(article_user.wallet_address, article.author, "[Wrong article Author]")
       assert.equal(article_user.wallet_address, deployer, "[User is not correct]")
@@ -122,7 +142,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       const article = await this.blog.articles(0)
       assert.equal(article.published, false, "[Wrong article Published Status]")
 
-      const result = await this.blog.togglePublished(0, { from: author1 }).should.be.rejected;
+      await this.blog.togglePublished(0, { from: author1 }).should.be.rejected
     })
 
     it('toggles article publish', async () => {
@@ -153,6 +173,30 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(web3.utils.BN(_author1.tips_sent), tipAmount, "[Should have 0.1 ether]")
     })
 
-  })
+    it('author tip self article', async () => {
+      const tipAmount = web3.utils.toWei('0.1', 'Ether')
+      let article = await this.blog.articles(0)
 
+      await this.blog.tipArticle(article.id, { from: deployer , value: tipAmount }).should.be.rejected
+    })
+
+    // Can't create article if user has no name,i.e. is not created
+    it('Cant create article if user has no name', async () => {
+      await this.blog.createArticle("Title", imageHash, "Amazing Content", author2).should.be.rejected
+    })
+
+    it('Create article after user is created', async () => {
+      await this.blog.createUser(web3.utils.utf8ToHex("Author 2"), author2)
+      const result = await this.blog.createArticle("Title", imageHash, "Amazing Content", author2)
+      const event = result.logs[0].args
+      
+      assert.equal(event.id.toNumber(), 2, "[Wrong article ID]")
+      assert.notEqual(event.date.toNumber(), null, "[Wrong article date]")
+      assert.equal(event.title, "Title", "[Wrong article Title]")
+      assert.equal(event.imageHash, imageHash, "[Wrong article Image Hash]")
+      assert.equal(event.content, "Amazing Content", "[Wrong article Content]")
+      assert.equal(event.published, false, "[Wrong article Published Status]")
+      assert.equal(event.tips, 0, "[Wrong Tips amoung]")
+    })
+  })
 })

@@ -1,14 +1,37 @@
 <template>
-  <ArticleList/>
+  <ArticleList v-if="user"/>
+  <CreateUser v-else />
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import ArticleList from '../components/ArticleList.vue'
+import CreateUser from '../components/CreateUser.vue'
 
 export default {
   name: 'App',
   components: {
-    ArticleList
+    ArticleList,
+    CreateUser
+  },
+  data() {
+    return {
+      user: null
+    }
+  },
+  computed: {
+
+  },
+  mounted() {
+    this.user = null,
+    this.load()
+  },
+  methods: {
+    ...mapActions(['GetAddress', 'GetUser']),
+    async load() {
+      await this.GetAddress()
+      await this.GetUser()
+    },
   }
 }
 </script>

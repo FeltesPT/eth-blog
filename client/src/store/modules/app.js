@@ -1,9 +1,9 @@
 import Blog from '../../contracts/Blog.json'
 import { ethers } from 'ethers';
 
-
 const CONTRACT_ADDRESS = Blog.networks['5777'].address;
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
+const provider = new ethers.providers.Web3Provider(window.ethereum)
+// const provider = new ethers.providers.JsonRpcProvider('http://localhost:7545');
 
 export const state = {
     contract: ethers.Contract

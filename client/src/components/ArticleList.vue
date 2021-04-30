@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions } from "vuex"
 import Article from '../store/models/Article'
 export default {
   name: "Article List",
@@ -64,7 +64,6 @@ export default {
   methods: {
     ...mapActions(["LoadContracts","GetAddress"]),
     async load() {
-      await this.LoadContracts()
       await this.GetAddress()
       await this.getCount()
       await this.getArticles()

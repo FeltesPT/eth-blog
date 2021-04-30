@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
 contract Blog {
@@ -67,13 +68,13 @@ contract Blog {
   }
 
   // Article Methods
-  function createArticle(string memory _title, string memory _imageUrl, string memory _content, address payable _author) public {
-    articles.push(Article(articleCount, block.timestamp, _title, _imageUrl, _content, _author, false, 0));
+  function createArticle(string memory _title, string memory _imageHash, string memory _content, address payable _author) public userExists(_author) {
+    articles.push(Article(articleCount, block.timestamp, _title, _imageHash, _content, _author, false, 0));
     
     articleToUser[articleCount] = msg.sender;
     userArticlesCount[msg.sender] = userArticlesCount[msg.sender] + 1;
 
-    emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageUrl, _content, _author, false, 0);
+    emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageHash, _content, _author, false, 0);
     articleCount++;
   }
 
@@ -121,6 +122,13 @@ contract Blog {
     emit ArticlePublished(_article.id, _article.date, _article.published);
   }
 
+  modifier userExists(address wallet_address) {
+    if (users[wallet_address].name == '') {
+      revert();
+    }
+    _;
+  }
+
   modifier articleExists(uint16 _id) {
     if(articles[_id].date == 0) {
       revert();
@@ -159,7 +167,6 @@ contract Blog {
     User memory _tipper = users[msg.sender];
     _tipper.tips_sent = _tipper.tips_sent + msg.value;
     users[msg.sender] = _tipper;
-
   }
 
 }
