@@ -21,13 +21,16 @@ const getters = {
 };
 const actions = {
     async GetAddress({ commit }) {
-        const signer = provider.getSigner()
-        const address = await signer.getAddress()
-        commit('setAddress', address)
+        if (typeof window.ethereum !== 'undefined') {
+            await window.ethereum.request({ method: 'eth_requestAccounts' })
+            const signer = provider.getSigner()
+            const address = await signer.getAddress()
+            commit('setAddress', address)
 
-        const balance = await provider.getBalance(address)
-        commit('setBalance', balance)
-        commit('setEtherBalance', balance)
+            const balance = await provider.getBalance(address)
+            commit('setBalance', balance)
+            commit('setEtherBalance', balance)
+        }
     },
     async GetUser({ commit }) {
         const contract = new ethers.Contract(CONTRACT_ADDRESS, Blog.abi, provider)
