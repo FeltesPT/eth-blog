@@ -1,6 +1,9 @@
 <template>
-  <div class="hello flex-col items-center justify-center container mx-auto">
-    <h1>Article:</h1>
+  <div v-if="loading">
+    <h1 class="text-3xl text-white text-center">Loading...</h1>
+  </div>
+  <div v-else class="hello flex-col items-center justify-center container mx-auto mt-10 space-y-10">
+    <img class="w-full max-h-96" :src="'https://ipfs.infura.io/ipfs/' + article.imageUrl" alt="Article Banner">
     <div v-if="!loading">
       <p class="text-lg">
         {{ article.title }}
@@ -22,7 +25,7 @@
 
 <script>
 import { mapActions } from "vuex";
-import Article from '../store/models/Article'
+import Article from '../../store/models/Article'
 export default {
   name: "Article List",
   data() {

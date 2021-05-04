@@ -1,18 +1,9 @@
 <template>
   <div class="hello flex-col items-center justify-center container mx-auto">
-    <h1>Welcome: {{ user.name }}</h1>
-    <h1>Your address is:</h1>
-    <p>{{ user.wallet_address }}</p>
-    <h3>Your balance is:</h3>
-    <p>{{ ethBalance }} ETH</p>
-    <h3>Articles:</h3>
-    <p>We have {{ count }} {{count > 1 ? "articles" : "article"}}</p>
     <div>
-      <button type="button" @click="$router.push({ path: 'create' })" class="bg-blue-400 text-white px-6 py-1">
-        <span class="text-lg">Create</span>
-      </button>
+      <h3 class="text-6xl text-center">Articles</h3>
+      <p class="text-center">We currently have {{ count }} {{count > 1 ? "articles" : "article"}}</p>
     </div>
-    <p class="mt-10">List: </p>
     <div class="flex-col mx-auto">
       <ArticleList :articles="articles"/>
     </div>
@@ -20,7 +11,7 @@
 </template>
 
 <script>
-import ArticleList from '../../components/ArticleList.vue'
+import ArticleList from '../../components/Article/ArticleList.vue'
 import { mapActions } from "vuex"
 
 export default {

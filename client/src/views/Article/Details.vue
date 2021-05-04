@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import ArticleDetails from '../../components/ArticleDetails.vue'
+import ArticleDetails from '../../components/Article/ArticleDetails.vue'
 
 export default {
   name: 'Article Details',

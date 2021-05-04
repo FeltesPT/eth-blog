@@ -80,7 +80,7 @@
 import { ethers } from 'ethers';
 import { mapActions } from "vuex";
 export default {
-  name: "Article List",
+  name: "Create Article",
   data() {
     return {
       title: "",
