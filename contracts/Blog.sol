@@ -1,11 +1,12 @@
+//SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
 contract Blog {
   struct User {
     bytes32 name;
     address wallet_address;
-    uint16 tips_received;
-    uint16 tips_sent;
+    uint tips_received;
+    uint tips_sent;
   }
 
   struct Article {
@@ -14,8 +15,9 @@ contract Blog {
     string title;
     string imageHash;
     string content;
-    address author;
+    address payable author;
     bool published;
+    uint tips;
   }
 
   uint16 public articleCount = 0;
@@ -28,8 +30,8 @@ contract Blog {
    event UserCreated(
     bytes32 name,
     address wallet_address,
-    uint16 tips_received,
-    uint16 tips_sent
+    uint tips_received,
+    uint tips_sent
   );
 
   event ArticleCreated(
@@ -39,7 +41,8 @@ contract Blog {
     string imageHash,
     string content,
     address author,
-    bool published
+    bool published,
+    uint tips
   );
 
   event ArticlePublished(
@@ -49,27 +52,28 @@ contract Blog {
   );
 
   constructor() {
-    createUser("Tiago Dias", msg.sender);
+    createUser("Tiago Dias");
     createArticle(
       "My first blog's title.",
       "QmQpmL2kW6YfTmGwmN82AqNUAh7rbp6rTj3QDBaAsrWgcm",
-      "My first blog article content!",
-      msg.sender
+      "My first blog article content!"
     );
   }
 
-  function createUser(bytes32 _name, address _wallet_address) public {
-    users[_wallet_address] = User(_name, _wallet_address, 0, 0);
-    emit UserCreated(_name, _wallet_address, 0, 0);
+  // User Methods
+  function createUser(bytes32 _name) public {
+    users[msg.sender] = User(_name, msg.sender, 0, 0);
+    emit UserCreated(_name, msg.sender, 0, 0);
   }
 
-  function createArticle(string memory _title, string memory _imageUrl, string memory _content, address _author) public {
-    articles.push(Article(articleCount, block.timestamp, _title, _imageUrl, _content, _author, false));
+  // Article Methods
+  function createArticle(string memory _title, string memory _imageHash, string memory _content) public userExists(msg.sender) {
+    articles.push(Article(articleCount, block.timestamp, _title, _imageHash, _content, payable(msg.sender), false, 0));
     
     articleToUser[articleCount] = msg.sender;
     userArticlesCount[msg.sender] = userArticlesCount[msg.sender] + 1;
 
-    emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageUrl, _content, _author, false);
+    emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageHash, _content, msg.sender, false, 0);
     articleCount++;
   }
 
@@ -83,7 +87,8 @@ contract Blog {
       string[] memory,
       string[] memory,
       address[] memory,
-      bool[] memory
+      bool[] memory,
+      uint[] memory
     ) {
 
       uint16[] memory ids = new uint16[](articleCount);
@@ -93,6 +98,7 @@ contract Blog {
       string[] memory contents = new string[](articleCount);
       address[] memory authors = new address[](articleCount);
       bool[] memory publisheds = new bool[](articleCount);
+      uint[] memory tips = new uint[](articleCount);
 
       for(uint i = 0; i < articleCount; i++) {
         ids[i] = articles[i].id;
@@ -102,9 +108,10 @@ contract Blog {
         contents[i] = articles[i].content;
         authors[i] = articles[i].author;
         publisheds[i] = articles[i].published;
+        tips[i] = articles[i].tips;
       }
 
-      return (ids, dates, titles, imageHashes, contents, authors, publisheds);
+      return (ids, dates, titles, imageHashes, contents, authors, publisheds, tips);
   }
 
   function togglePublished(uint16 _id) external articleExists(_id) isOwner(_id) {
@@ -112,6 +119,13 @@ contract Blog {
     _article.published = !_article.published;
     _article.date = block.timestamp;
     emit ArticlePublished(_article.id, _article.date, _article.published);
+  }
+
+  modifier userExists(address wallet_address) {
+    if (users[wallet_address].name == '') {
+      revert();
+    }
+    _;
   }
 
   modifier articleExists(uint16 _id) {
@@ -126,6 +140,32 @@ contract Blog {
       revert();
     }
     _;
+  }
+
+  modifier isNotOwner(uint16 _id) {
+    if (articles[_id].author == msg.sender) {
+      revert();
+    }
+    _;
+  }
+
+  // Tips
+  function tipArticle(uint16 _id) public payable articleExists(_id) isNotOwner(_id) {
+    Article memory _article = articles[_id];
+
+    address payable _author_address = _article.author;
+    _author_address.transfer(msg.value);
+
+    _article.tips = _article.tips + msg.value;
+    articles[_id] = _article;
+    
+    User memory _author = users[_author_address];
+    _author.tips_received = _author.tips_received + msg.value;
+    users[_author_address] = _author;
+
+    User memory _tipper = users[msg.sender];
+    _tipper.tips_sent = _tipper.tips_sent + msg.value;
+    users[msg.sender] = _tipper;
   }
 
 }
