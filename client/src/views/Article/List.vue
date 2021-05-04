@@ -22,12 +22,11 @@ export default {
   computed: {
     user () { return this.$store.getters.user },
     ethBalance () { return this.$store.getters.accountEthBalance },
-    contract () { return this.$store.getters.contract },
+    contract () { return this.$store.getters.readContract },
     articles () { return this.$store.getters.articles },
     count () { return this.articles ? this.articles.length : 0 },
   },
   mounted() {
-    this.count = 0
     this.load()
   },
   methods: {

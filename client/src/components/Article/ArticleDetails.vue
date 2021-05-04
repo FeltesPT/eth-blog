@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     address: function() { return this.$store.getters.accountAddress },
-    contract: function() { return this.$store.getters.contract },
+    contract: function() { return this.$store.getters.readContract },
   },
   mounted() {
     this.article = null
@@ -56,7 +56,7 @@ export default {
     async getArticle() {
       this.loading = true
 
-      const json = await this.$store.getters.contract.articles(this.$route.params.id);
+      const json = await this.$store.getters.readContract.articles(this.$route.params.id);
       this.article = new Article([
           json[0],
           json[1],
@@ -68,7 +68,7 @@ export default {
           json[7]
         ])
 
-      const author = await this.$store.getters.contract.users(this.article.author)
+      const author = await this.$store.getters.readContract.users(this.article.author)
       this.article.authorName = web3.utils.hexToUtf8(author.name)
 
       this.loading = false

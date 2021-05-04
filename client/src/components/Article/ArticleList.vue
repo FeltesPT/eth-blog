@@ -5,12 +5,12 @@
 </template>
 
 <script>
-import Article from '../../store/models/Article'
+import { ethers } from 'ethers';
 import ArticleListCell from './ArticleListCell'
 
 export default {
   props: {
-    articles: [Article]
+    articles: ethers.articles
   },
   components: {
     ArticleListCell

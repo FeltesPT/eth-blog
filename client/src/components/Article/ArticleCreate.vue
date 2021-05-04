@@ -7,21 +7,22 @@
       </button>
     </div>
     <div class="flex flex-col">
+      <label class="py-2 text-left" for="imageUrl">Banner</label>
+      <input
+        type='file'
+        accept=".jpg, .jpeg, .png, .bmp, .gif"
+        class="form-control focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-2 mb-2"
+        aria-describedby="Image Url"
+        @change="imageInputChanged"
+      />
+    </div>
+    <div class="flex flex-col">
       <label class="py-2 text-left" for="title">Title</label>
       <input
         type="text"
         class="form-control focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-2 mb-2"
         aria-describedby="Title"
         v-model="title"
-      />
-    </div>
-    <div class="flex flex-col">
-      <label class="py-2 text-left" for="imageUrl">Image Url</label>
-      <input
-        type="text"
-        class="form-control focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-2 mb-2"
-        aria-describedby="Image Url"
-        v-model="imageUrl"
       />
     </div>
     <div class="flex flex-col">
@@ -35,18 +36,12 @@
       >
       </textarea>
     </div>
-    <div class="flex flex-col">
-      <label class="py-2 text-left" for="author">Author</label>
-      <input
-        type="text"
-        class="form-control focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-2 mb-2"
-        aria-describedby="Author"
-        v-model="author"
-      />
-    </div>
-    <div class="flex flex-col">
-      <button class="disabled:opacity-50 w-1/2 flex py-4 ml-2 items-center justify-center rounded-md bg-blue-500 text-white" type="submit" @click.prevent="submit" :disabled="isLoading">
+    <div class="flex mt-8">
+      <button class="disabled:opacity-50 w-1/2 flex py-4 items-center justify-center rounded-md bg-blue-500 text-white" type="submit" @click.prevent="submit" :disabled="loading">
         Submit
+      </button>
+      <button class="disabled:opacity-50 w-1/2 flex py-4 ml-2 items-center justify-center rounded-md bg-red-500 text-white" type="submit" @click.prevent="$router.go(-1)" :disabled="loading">
+        Cancel
       </button>
     </div>
     <div v-if="showError"
@@ -77,27 +72,28 @@
 </template>
 
 <script>
-import { ethers } from 'ethers';
 import { mapActions } from "vuex";
+import ipfsClient from 'ipfs-http-client'
+
 export default {
   name: "Create Article",
   data() {
     return {
+      buffer: {},
+      imageHash: "",
       title: "",
-      imageUrl: "",
       content: "",
-      author: "",
       loading: true,
       showSuccess: false,
       showError: false
     }
   },
   computed: {
-    address: function() { return this.$store.getters.accountAddress },
-    contract: function() { return this.$store.getters.contract },
+    address () { return this.$store.getters.accountAddress },
+    contract () { return this.$store.getters.readContract },
+    ipfs () { return ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) } // leaving out the arguments will default to these values
   },
   mounted() {
-    this.loading = true
     this.load()
   },
   methods: {
@@ -108,12 +104,40 @@ export default {
 
       this.loading = false
     },
+    imageInputChanged(event) {
+      const file = event.target.files[0]
+      const reader = new window.FileReader()
+      reader.readAsArrayBuffer(file)
+
+      reader.onloadend = () => {
+        this.buffer = Buffer(reader.result)
+      }      
+    },
+    async uploadFile() {
+      this.ipfs.add(this.buffer)
+      .then((hash) => {
+        if (!hash) {
+          console.error("No hash!")
+          return
+        }
+
+        this.imageHash = hash.path
+        this.saveArticle()
+      })
+    },
     async submit() {
       this.loading = true
-      console.log("Save")
-      const txResponse = await this.$store.getters.contract.createArticle(this.title, this.imageUrl ,this.content, ethers.utils.formatBytes32String(this.author))
+      await this.uploadFile()
+    },
+    async saveArticle() {
+      if (this.imageHash === "") {
+        this.showError = true
+        this.loading = false
+        return
+      }
 
-      const result = await txResponse.wait();
+      const txResponse = await this.$store.getters.writeContract.createArticle(this.title, this.imageHash, this.content)
+      const result = await txResponse.wait()
 
       if (result.status == 1) {
         this.showSuccess = true
@@ -123,8 +147,8 @@ export default {
       
       this.loading = false
     }
-  },
-};
+  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

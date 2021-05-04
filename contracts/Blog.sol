@@ -56,8 +56,7 @@ contract Blog {
     createArticle(
       "My first blog's title.",
       "QmQpmL2kW6YfTmGwmN82AqNUAh7rbp6rTj3QDBaAsrWgcm",
-      "My first blog article content!",
-      payable(msg.sender)
+      "My first blog article content!"
     );
   }
 
@@ -68,13 +67,13 @@ contract Blog {
   }
 
   // Article Methods
-  function createArticle(string memory _title, string memory _imageHash, string memory _content, address payable _author) public userExists(_author) {
-    articles.push(Article(articleCount, block.timestamp, _title, _imageHash, _content, _author, false, 0));
+  function createArticle(string memory _title, string memory _imageHash, string memory _content) public userExists(msg.sender) {
+    articles.push(Article(articleCount, block.timestamp, _title, _imageHash, _content, payable(msg.sender), false, 0));
     
     articleToUser[articleCount] = msg.sender;
     userArticlesCount[msg.sender] = userArticlesCount[msg.sender] + 1;
 
-    emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageHash, _content, _author, false, 0);
+    emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageHash, _content, msg.sender, false, 0);
     articleCount++;
   }
 

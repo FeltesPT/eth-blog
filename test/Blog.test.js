@@ -118,7 +118,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(articles.length, 1, "[We don't have one Article on the array]")
 
       const article = articles[0]
-      const result = await this.blog.createArticle("A secondary title", imageHash , "A secondary article", deployer)
+      const result = await this.blog.createArticle("A secondary title", imageHash , "A secondary article", { from: deployer })
       
       articlesJSON = await this.blog.getArticles()
       assert.equal(articlesJSON[0].length, 2, "[We don't have two Article on the array]")
@@ -182,12 +182,12 @@ contract('Blog', ([deployer, author1, author2]) => {
 
     // Can't create article if user has no name,i.e. is not created
     it('Cant create article if user has no name', async () => {
-      await this.blog.createArticle("Title", imageHash, "Amazing Content", author2).should.be.rejected
+      await this.blog.createArticle("Title", imageHash, "Amazing Content", { from: author2 }).should.be.rejected
     })
 
     it('Create article after user is created', async () => {
       await this.blog.createUser(web3.utils.stringToHex("Author 2"), { from: author2 })
-      const result = await this.blog.createArticle("Title", imageHash, "Amazing Content", author2)
+      const result = await this.blog.createArticle("Title", imageHash, "Amazing Content", { from: author2 })
       const event = result.logs[0].args
       
       assert.equal(event.id.toNumber(), 2, "[Wrong article ID]")

@@ -20,7 +20,6 @@ export default {
     },
   },
   mounted() {
-    this.user = null,
     this.load()
   },
   methods: {
