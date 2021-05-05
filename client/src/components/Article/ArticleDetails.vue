@@ -3,25 +3,39 @@
     <h1 class="text-3xl text-white text-center">Loading...</h1>
   </div>
   <div v-else class="hello flex-col items-center justify-center container mx-auto mt-10 space-y-10">
+    <div class="flex justify-between">
+      <button type="button" @click="$router.go(-1)" class="bg-blue-400 text-white px-6 py-1">
+        <span class="text-lg">Back</span>
+      </button>
+      <div v-if="address === article.author" class="space-x-3">
+        <button type="button" @click.prevent="togglePublish" class="bg-red-400 text-white px-6 py-1">
+          <span class="text-lg"> {{article.published ? "Unpublish" : "Publish" }}</span>
+        </button>
+        <button type="button" @click.prevent="" class="bg-blue-400 text-white px-6 py-1">
+          <span class="text-lg">Edit</span>
+        </button>
+      </div>
+    </div>
     <img class="w-full max-h-96" :src="'https://ipfs.infura.io/ipfs/' + article.imageUrl" alt="Article Banner">
     <figcaption class="font-medium">
       <div class="text-gray-500">
         Author: <span class="text-blue-500">{{ article.authorName }}</span>
       </div>
       <div class="text-gray-500">
-        Published: <span class="text-blue-500">{{ format_time(article.date.toNumber()) }}</span>
+        Last Updated: <span class="text-blue-500">{{ format_time(article.date.toNumber()) }}</span>
       </div>
       <div class="text-gray-500">
         Published: {{ article.published ? "Yes" : "No" }}
+      </div>
+      <div class="text-gray-500">
+        Article Tips: {{ article.tips.toNumber() }}
       </div>
     </figcaption>
     <div v-if="!loading" class="space-y-2">
       <p class="text-2xl font-semibold">
         {{ article.title }}
       </p>
-      <p class="text-gray-800">
-        {{ article.content }}
-      </p>
+      <p><span v-html="article.content"></span></p>
     </div>
   </div>
 </template>
@@ -80,6 +94,23 @@ export default {
       });
       
       return dtFormat.format(new Date(s * 1e3));
+    },
+    async togglePublish() {
+      if (this.address !== this.article.author) {
+        console.log("Wrong author")
+        return
+      }
+      
+      const txResponse = await this.$store.getters.writeContract.togglePublished(this.article.id)
+      const result = await txResponse.wait()
+
+      if (result.status == 1) {
+        // Show Success
+      } else {
+        // Show Error
+      }
+
+      this.getArticle()
     }
   },
 };
