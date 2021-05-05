@@ -32,26 +32,35 @@ const actions = {
 
         const art = []
 
-        for (let i of articles[0]) {
-          const article = new Article([
-            articles[0][i],
-            articles[1][i],
-            articles[2][i],
-            articles[3][i],
-            articles[4][i],
-            articles[5][i],
-            articles[6][i],
-            articles[7][i]
-          ])
+        for(var i = 0; i < articles.length; i++) {
+            const article = new Article(articles[i])
+    
+            const author = await contract.users(article.author)
+            article.authorName = web3.utils.hexToUtf8(author.name)
 
-          const author = await contract.users(article.author)
-          article.authorName = web3.utils.hexToUtf8(author.name)
-
-          art.push(article)
+            art.push(article)
         }
 
         commit('setArticles', art)
-    }
+    },
+
+    async GetMyArticles({ commit }) {
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, Blog.abi, provider)
+        const articles = await contract.getUserArticles()
+
+        const art = []
+
+        for(var i = 0; i < articles.length; i++) {
+            const article = new Article(articles[i])
+    
+            const author = await contract.users(article.author)
+            article.authorName = web3.utils.hexToUtf8(author.name)
+
+            art.push(article)
+        }
+
+        commit('setArticles', art)
+    },
 };
 const mutations = {
     setContract(state, contract) {

@@ -3,6 +3,7 @@ import Home from '../views/Home.vue';
 import Details from '../views/Article/Details.vue';
 import Create from '../views/Article/Create.vue';
 import Edit from '../views/Article/Edit.vue';
+import Profile from '../views/Article/Profile.vue';
 import Layout from '../views/Layout.vue';
 
 const routes = [
@@ -34,6 +35,12 @@ const routes = [
           name: 'Edit',
           component: Edit,
           meta: { guest: true, title: 'Epic Code - Edit' },
+        },
+        {
+          path: 'profile',
+          name: 'Profile',
+          component: Profile,
+          meta: { guest: true, title: 'Epic Code - Profile' },
         },
       ],
   },

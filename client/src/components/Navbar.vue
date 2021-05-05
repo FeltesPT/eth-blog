@@ -5,7 +5,9 @@
         <p class="my-2 text-3xl">Epic Code - Blog</p>
       </button>
       <div class="flex h-full">
-        <p class="mr-4 my-auto">{{ user.name.length > 0 ? user.name : user.wallet_address }}</p>
+        <router-link class="mr-4 my-auto" :to="{ name: 'Profile'}">
+          <p>{{ user.name.length > 0 ? user.name : user.wallet_address }}</p>
+        </router-link>
         <div class="my-auto">
           <button type="button" @click="$router.push({ path: 'create' })" class="bg-blue-400 text-white px-6 py-1">
             <span class="text-lg">Write</span>

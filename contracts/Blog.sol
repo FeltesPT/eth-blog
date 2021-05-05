@@ -21,7 +21,7 @@ contract Blog {
   }
 
   uint16 public articleCount = 0;
-  Article[] public articles;
+  Article[] private articles;
 
   mapping(address => User) public users;
   mapping(uint => address) public articleToUser;
@@ -69,6 +69,11 @@ contract Blog {
       "QmQpmL2kW6YfTmGwmN82AqNUAh7rbp6rTj3QDBaAsrWgcm",
       "My first blog article content!"
     );
+    // createArticle(
+    //   "My second blog's title.",
+    //   "QmfG4fbLdwbhaS3beJuAhJduhCuvrFd8cqui6EDzVkdGYd",
+    //   "It's about unicorns!"
+    // );
   }
 
   // User Methods
@@ -88,51 +93,66 @@ contract Blog {
     articleCount++;
   }
 
-  function editArticle(uint16 _id, string memory _title, string memory _imageHash, string memory _content) public userExists(msg.sender) articleExists(_id) isOwner(_id) {
-    Article storage _article = articles[_id];
-    _article.title = _title;
-    _article.content = _content;
-    _article.imageHash = _imageHash;
-    _article.date = block.timestamp;
+  function editArticle(uint16 _id, string memory _title, string memory _imageHash, string memory _content)
+    public
+    userExists(msg.sender)
+    articleExists(_id)
+    isOwner(_id) {
+      
+      Article storage _article = articles[_id];
+      _article.title = _title;
+      _article.content = _content;
+      _article.imageHash = _imageHash;
+      _article.date = block.timestamp;
 
-    emit ArticleEdited(_article.id, _article.date, _article.title, _article.imageHash, _article.content, _article.author, _article.published, _article.tips);
+      emit ArticleEdited(_article.id, _article.date, _article.title, _article.imageHash, _article.content, _article.author, _article.published, _article.tips);
   }
 
-  function getArticles()
-    external
-    view
-    returns(
-      uint16[] memory,
-      uint[] memory,
-      string[] memory,
-      string[] memory,
-      string[] memory,
-      address[] memory,
-      bool[] memory,
-      uint[] memory
-    ) {
+  function getArticle(uint16 _id) external view returns(Article memory) {
+      Article memory _article = articles[_id];
 
-      uint16[] memory ids = new uint16[](articleCount);
-      uint[] memory dates = new uint[](articleCount);
-      string[] memory titles = new string[](articleCount);
-      string[] memory imageHashes = new string[](articleCount);
-      string[] memory contents = new string[](articleCount);
-      address[] memory authors = new address[](articleCount);
-      bool[] memory publisheds = new bool[](articleCount);
-      uint[] memory tips = new uint[](articleCount);
-
-      for(uint i = 0; i < articleCount; i++) {
-        ids[i] = articles[i].id;
-        dates[i] = articles[i].date;
-        titles[i] = articles[i].title;
-        imageHashes[i] = articles[i].imageHash;
-        contents[i] = articles[i].content;
-        authors[i] = articles[i].author;
-        publisheds[i] = articles[i].published;
-        tips[i] = articles[i].tips;
+      if (_article.published || (!_article.published && _article.author == msg.sender)) {
+        return _article;  
       }
 
-      return (ids, dates, titles, imageHashes, contents, authors, publisheds, tips);
+      revert();
+  }
+
+  function getArticles() external view returns(Article[] memory) {
+      Article[] memory _articles = new Article[](articleCount);
+
+      uint16 _publishedCount = 0;
+
+      for(uint i = 0; i < articleCount; i++) {
+        // Only published articles are being sent
+        if (articles[i].published) {
+          _articles[i] = articles[i];
+          _publishedCount++;
+        }
+      }
+
+      Article[] memory _publishedArticles = new Article[](_publishedCount);
+      for(uint i = 0; i < _articles.length; i++) {
+        // Only published articles are being sent
+        if (_articles[i].published) {
+          _publishedArticles[i] = articles[i];
+        }
+      }
+
+      return _publishedArticles;
+  }
+
+  function getUserArticles() external view returns(Article[] memory) {
+
+      Article[] memory _articles = new Article[](articleCount);
+
+      for(uint i = 0; i < articleCount; i++) {
+        if (articles[i].author == msg.sender) {
+          _articles[i] = articles[i];
+        }
+      }
+
+      return _articles;
   }
 
   function togglePublished(uint16 _id) external articleExists(_id) isOwner(_id) {
