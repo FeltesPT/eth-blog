@@ -198,5 +198,62 @@ contract('Blog', ([deployer, author1, author2]) => {
       assert.equal(event.published, false, "[Wrong article Published Status]")
       assert.equal(event.tips, 0, "[Wrong Tips amoung]")
     })
+
+    it('Edit article title', async () => {
+      var articlesJSON = await this.blog.getArticles()
+      var articles = articlesFromJSON(articlesJSON)
+      const article = articles[0]
+
+      const result = await this.blog.editArticle(article.id, "Updated Title", article.imageHash , article.content, { from: deployer })
+      const event = result.logs[0].args
+      
+      assert.equal(event.id.toNumber(), 0, "[Wrong article ID]")
+      assert.equal(event.title, "Updated Title", "[Wrong article title]")
+    })
+
+    it('Edit article imageHash', async () => {
+      var articlesJSON = await this.blog.getArticles()
+      var articles = articlesFromJSON(articlesJSON)
+      const article = articles[0]
+
+      const result = await this.blog.editArticle(article.id, article.title, "differentHash" , article.content, { from: deployer })
+      const event = result.logs[0].args
+      
+      assert.equal(event.id.toNumber(), 0, "[Wrong article ID]")
+      assert.equal(event.imageHash, "differentHash", "[Wrong article imageHash]")
+    })
+
+    it('Edit article content', async () => {
+      var articlesJSON = await this.blog.getArticles()
+      var articles = articlesFromJSON(articlesJSON)
+      const article = articles[0]
+
+      const result = await this.blog.editArticle(article.id, article.title, article.imageHash, "Updated Content", { from: deployer })
+      const event = result.logs[0].args
+      
+      assert.equal(event.id.toNumber(), 0, "[Wrong article ID]")
+      assert.equal(event.content, "Updated Content", "[Wrong article content]")
+    })
+
+    it('Edit article', async () => {
+      var articlesJSON = await this.blog.getArticles()
+      var articles = articlesFromJSON(articlesJSON)
+      const article = articles[0]
+
+      const result = await this.blog.editArticle(article.id, "Totally Different Title", "totallyDifferentHash", "Totally Different Content", { from: deployer })
+      const event = result.logs[0].args
+      
+      assert.equal(event.id.toNumber(), 0, "[Wrong article ID]")
+      assert.equal(event.title, "Totally Different Title", "[Wrong article title]")
+      assert.equal(event.imageHash, "totallyDifferentHash", "[Wrong article imageHash]")
+      assert.equal(event.content, "Totally Different Content", "[Wrong article content]")
+    })
+
+    it('Wrong author should fail to edit article', async () => {
+      var articlesJSON = await this.blog.getArticles()
+      var articles = articlesFromJSON(articlesJSON)
+      const article = articles[0]
+      await this.blog.editArticle(article.id, "Totally Different Title", "totallyDifferentHash", "Totally Different Content", { from: author2 }).should.be.rejected
+    })
   })
 })

@@ -45,6 +45,17 @@ contract Blog {
     uint tips
   );
 
+  event ArticleEdited(
+    uint16 id,
+    uint date,
+    string title,
+    string imageHash,
+    string content,
+    address author,
+    bool published,
+    uint tips
+  );
+
   event ArticlePublished(
     uint16 id,
     uint date,
@@ -75,6 +86,16 @@ contract Blog {
 
     emit ArticleCreated(articleCount, articles[articleCount].date, _title, _imageHash, _content, msg.sender, false, 0);
     articleCount++;
+  }
+
+  function editArticle(uint16 _id, string memory _title, string memory _imageHash, string memory _content) public userExists(msg.sender) articleExists(_id) isOwner(_id) {
+    Article storage _article = articles[_id];
+    _article.title = _title;
+    _article.content = _content;
+    _article.imageHash = _imageHash;
+    _article.date = block.timestamp;
+
+    emit ArticleEdited(_article.id, _article.date, _article.title, _article.imageHash, _article.content, _article.author, _article.published, _article.tips);
   }
 
   function getArticles()
