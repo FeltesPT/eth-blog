@@ -1,5 +1,5 @@
 <template>
-  <div class="hello flex-col items-center justify-center container mx-auto">
+  <div class="flex-col items-center justify-center container mx-auto min-h-screen" :style="{'background-image': 'url(' + require('@/assets/images/geometry.png') + ')'}">
     <div>
       <h3 class="text-6xl text-center">Articles</h3>
       <p class="text-center">We currently have {{ count }} {{count > 1 ? "articles" : "article"}}</p>

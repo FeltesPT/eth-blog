@@ -1,6 +1,6 @@
 <template>
   <router-link :to="{ name: 'Details', params: { id: article.id }}">
-    <figure class="flex justify-between my-10 max-h-48 border-2 border-gray-400 p-4">
+    <figure class="flex justify-between my-10 max-h-48 border-2 border-gray-400 p-4 bg-white">
       <div class="flex-col text-center md:text-left space-y-2 w-full">
         <figcaption class="flex text-xs">
           <span class="mr-2">Writer: </span>

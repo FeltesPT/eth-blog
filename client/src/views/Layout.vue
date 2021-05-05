@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="bg-gray-50 min-h-screen">
+  <div class="bg-gray-50 min-h-screen">
     <Navbar v-if="user.name" :user="user" />
     <router-view/>
   </div>

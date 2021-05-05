@@ -2,7 +2,7 @@
   <div v-if="loading">
     <h1 class="text-3xl text-white text-center">Loading...</h1>
   </div>
-  <div v-else class="hello flex-col items-center justify-center container mx-auto mt-10 space-y-10">
+  <div v-else class="flex-col items-center justify-center container mx-auto mt-10 space-y-10">
     <div class="flex justify-between">
       <button type="button" @click="$router.go(-1)" class="bg-blue-400 text-white px-6 py-1">
         <span class="text-lg">Back</span>
