@@ -18,7 +18,7 @@
         <p class="text-lg max-h-20 overflow-hidden"><span v-html="article.content"></span></p>
       </div>
       <div class="overflow-hidden w-1/5">
-        <img class="flex float-right h-full content-center" :src="'https://ipfs.infura.io/ipfs/' + article.imageUrl" alt="" width="384" height="512">
+        <img class="flex float-right h-full content-center" :src="'https://ipfs.infura.io/ipfs/' + article.imageHash" alt="" width="384" height="512">
       </div>
     </figure>
   </router-link>

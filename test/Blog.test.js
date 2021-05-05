@@ -74,6 +74,7 @@ contract('Blog', ([deployer, author1, author2]) => {
 
   describe('Articles', async () => {
     const imageHash = 'QmQpmL2kW6YfTmGwmN82AqNUAh7rbp6rTj3QDBaAsrWgcm' // Wolf
+    const secondImageHash = 'QmfG4fbLdwbhaS3beJuAhJduhCuvrFd8cqui6EDzVkdGYd' // Unicorn
 
     it('lists articles', async () => {
       const articleCount = await this.blog.articleCount()
@@ -216,11 +217,11 @@ contract('Blog', ([deployer, author1, author2]) => {
       var articles = articlesFromJSON(articlesJSON)
       const article = articles[0]
 
-      const result = await this.blog.editArticle(article.id, article.title, "differentHash" , article.content, { from: deployer })
+      const result = await this.blog.editArticle(article.id, article.title, secondImageHash , article.content, { from: deployer })
       const event = result.logs[0].args
       
       assert.equal(event.id.toNumber(), 0, "[Wrong article ID]")
-      assert.equal(event.imageHash, "differentHash", "[Wrong article imageHash]")
+      assert.equal(event.imageHash, secondImageHash, "[Wrong article imageHash]")
     })
 
     it('Edit article content', async () => {
@@ -240,12 +241,12 @@ contract('Blog', ([deployer, author1, author2]) => {
       var articles = articlesFromJSON(articlesJSON)
       const article = articles[0]
 
-      const result = await this.blog.editArticle(article.id, "Totally Different Title", "totallyDifferentHash", "Totally Different Content", { from: deployer })
+      const result = await this.blog.editArticle(article.id, "Totally Different Title", secondImageHash, "Totally Different Content", { from: deployer })
       const event = result.logs[0].args
       
       assert.equal(event.id.toNumber(), 0, "[Wrong article ID]")
       assert.equal(event.title, "Totally Different Title", "[Wrong article title]")
-      assert.equal(event.imageHash, "totallyDifferentHash", "[Wrong article imageHash]")
+      assert.equal(event.imageHash, secondImageHash, "[Wrong article imageHash]")
       assert.equal(event.content, "Totally Different Content", "[Wrong article content]")
     })
 
@@ -253,7 +254,7 @@ contract('Blog', ([deployer, author1, author2]) => {
       var articlesJSON = await this.blog.getArticles()
       var articles = articlesFromJSON(articlesJSON)
       const article = articles[0]
-      await this.blog.editArticle(article.id, "Totally Different Title", "totallyDifferentHash", "Totally Different Content", { from: author2 }).should.be.rejected
+      await this.blog.editArticle(article.id, "Totally Different Title", secondImageHash, "Totally Different Content", { from: author2 }).should.be.rejected
     })
   })
 })

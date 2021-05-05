@@ -11,12 +11,12 @@
         <button type="button" @click.prevent="togglePublish" class="bg-red-400 text-white px-6 py-1">
           <span class="text-lg"> {{article.published ? "Unpublish" : "Publish" }}</span>
         </button>
-        <button type="button" @click.prevent="" class="bg-blue-400 text-white px-6 py-1">
+        <button type="button" @click.prevent="$router.push({ path: `/${article.id}/edit` })" class="bg-blue-400 text-white px-6 py-1">
           <span class="text-lg">Edit</span>
         </button>
       </div>
     </div>
-    <img class="w-full max-h-96" :src="'https://ipfs.infura.io/ipfs/' + article.imageUrl" alt="Article Banner">
+    <img class="w-full max-h-96" :src="'https://ipfs.infura.io/ipfs/' + article.imageHash" alt="Article Banner">
     <figcaption class="font-medium">
       <div class="text-gray-500">
         Author: <span class="text-blue-500">{{ article.authorName }}</span>
