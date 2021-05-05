@@ -19,9 +19,7 @@
       <p class="text-2xl font-semibold">
         {{ article.title }}
       </p>
-      <p class="text-gray-800">
-        {{ article.content }}
-      </p>
+      <p><span v-html="article.content"></span></p>
     </div>
   </div>
 </template>

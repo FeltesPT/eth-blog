@@ -27,14 +27,23 @@
     </div>
     <div class="flex flex-col">
       <label class="py-2 text-left" for="content">Content</label>
-      <textarea
-        type="text"
-        class="form-control focus:border-light-blue-500 focus:ring-1 focus:ring-light-blue-500 focus:outline-none text-sm text-black placeholder-gray-500 border border-gray-200 rounded-md py-2 pl-2"
-        rows="5" max-rows="20"
-        aria-describedby="Content"
-        v-model="content"
-      >
-      </textarea>
+      <editor
+      :api-key="tinymceKey"
+      :init="{
+        height: 500,
+        menubar: false,
+        plugins: [
+          'advlist autolink lists link image charmap print preview anchor',
+          'searchreplace visualblocks code fullscreen',
+          'insertdatetime media table paste code help wordcount'
+        ],
+        toolbar:
+          'undo redo | formatselect | bold italic backcolor | \
+          alignleft aligncenter alignright alignjustify | \
+          bullist numlist outdent indent | removeformat | help'
+      }"
+      v-model="content"
+    />
     </div>
     <div class="flex mt-8">
       <button class="disabled:opacity-50 w-1/2 flex py-4 items-center justify-center rounded-md bg-blue-500 text-white" type="submit" @click.prevent="submit" :disabled="loading">
@@ -74,9 +83,13 @@
 <script>
 import { mapActions } from "vuex";
 import ipfsClient from 'ipfs-http-client'
+import Editor from '@tinymce/tinymce-vue'
 
 export default {
   name: "Create Article",
+  components: {
+    Editor
+  },
   data() {
     return {
       buffer: {},
@@ -91,9 +104,11 @@ export default {
   computed: {
     address () { return this.$store.getters.accountAddress },
     contract () { return this.$store.getters.readContract },
-    ipfs () { return ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) } // leaving out the arguments will default to these values
+    ipfs () { return ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) }, // leaving out the arguments will default to these values
+    tinymceKey() { return process.env.VUE_APP_TINYMCE_API_KEY }
   },
   mounted() {
+    console.log(this.tinymceKey);
     this.load()
   },
   methods: {

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.13.0",
+    "@tinymce/tinymce-vue": "^4.0.0",
     "core-js": "^3.6.5",
     "ipfs-http-client": "^49.0.4",
     "vue": "^3.0.0",
