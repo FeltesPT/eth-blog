@@ -45,7 +45,7 @@ const actions = {
     },
 
     async GetMyArticles({ commit }) {
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, Blog.abi, provider)
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, Blog.abi, provider.getSigner())
         const articles = await contract.getUserArticles()
 
         const art = []

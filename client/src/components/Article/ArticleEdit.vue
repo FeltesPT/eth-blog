@@ -125,17 +125,8 @@ export default {
     async getArticle() {
       this.loading = true
 
-      const json = await this.$store.getters.readContract.articles(this.$route.params.id);
-      this.article = new Article([
-          json[0],
-          json[1],
-          json[2],
-          json[3],
-          json[4],
-          json[5],
-          json[6],
-          json[7]
-        ])
+      const json = await this.$store.getters.readContract.getArticle(this.$route.params.id);
+      this.article = new Article(json)
 
       if (this.article.author !== this.address) {
         this.$router.go(-1)

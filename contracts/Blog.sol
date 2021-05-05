@@ -146,10 +146,18 @@ contract Blog {
 
       Article[] memory _articles = new Article[](articleCount);
 
+      uint16 _myCount = 0;
+
       for(uint i = 0; i < articleCount; i++) {
         if (articles[i].author == msg.sender) {
           _articles[i] = articles[i];
+          _myCount++;
         }
+      }
+
+      Article[] memory _myArticles = new Article[](_myCount);
+      for(uint i = 0; i < _articles.length; i++) {
+        _myArticles[i] = articles[i];
       }
 
       return _articles;
