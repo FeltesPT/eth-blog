@@ -8,8 +8,8 @@
         <span class="text-lg">Back</span>
       </button>
       <div v-if="address === article.author" class="space-x-3">
-        <button v-if="!article.published" type="button" @click.prevent="publish" class="bg-red-400 text-white px-6 py-1">
-          <span class="text-lg">Publish</span>
+        <button type="button" @click.prevent="togglePublish" class="bg-red-400 text-white px-6 py-1">
+          <span class="text-lg"> {{article.published ? "Unpublish" : "Publish" }}</span>
         </button>
         <button type="button" @click.prevent="" class="bg-blue-400 text-white px-6 py-1">
           <span class="text-lg">Edit</span>
@@ -95,7 +95,7 @@ export default {
       
       return dtFormat.format(new Date(s * 1e3));
     },
-    async publish() {
+    async togglePublish() {
       if (this.address !== this.article.author) {
         console.log("Wrong author")
         return
