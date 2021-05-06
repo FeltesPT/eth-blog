@@ -112,7 +112,6 @@ export default {
     tinymceKey() { return process.env.VUE_APP_TINYMCE_API_KEY }
   },
   mounted() {
-    console.log(this.tinymceKey);
     this.load()
   },
   methods: {

@@ -1,6 +1,7 @@
 <template>
-  <div class="bg-gray-50 min-h-screen">
-    <Navbar v-if="user.name" :user="user" />
+  <CreateUser v-if="!user.name" />
+  <div v-else class="bg-gray-50 min-h-screen">
+    <Navbar :user="user" />
     <router-view/>
   </div>
 </template>
@@ -8,11 +9,13 @@
 <script>
 import { mapActions } from "vuex";
 import Navbar from '../components/Navbar.vue';
+import CreateUser from './User/Create.vue'
 
 export default {
   name: 'Home',
   components: {
-    Navbar
+    Navbar,
+    CreateUser
   },
   computed: {
     user: function() { 
