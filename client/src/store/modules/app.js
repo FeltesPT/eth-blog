@@ -1,4 +1,3 @@
-import web3 from 'web3'
 import { ethers } from 'ethers';
 import Article from '../models/Article'
 import Blog from '../../contracts/Blog.json'
@@ -36,7 +35,7 @@ const actions = {
             const article = new Article(articles[i])
     
             const author = await contract.users(article.author)
-            article.authorName = web3.utils.hexToUtf8(author.name)
+            article.authorName = ethers.utils.toUtf8String(author.name)
 
             art.push(article)
         }
@@ -54,7 +53,7 @@ const actions = {
             const article = new Article(articles[i])
     
             const author = await contract.users(article.author)
-            article.authorName = web3.utils.hexToUtf8(author.name)
+            article.authorName = ethers.utils.toUtf8String(author.name)
 
             art.push(article)
         }

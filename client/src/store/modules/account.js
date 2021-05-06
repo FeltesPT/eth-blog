@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import web3 from 'web3'
 import Blog from '../../contracts/Blog.json'
 
 const CONTRACT_ADDRESS = Blog.networks['5777'].address;
@@ -7,8 +6,6 @@ const provider = new ethers.providers.Web3Provider(window.ethereum)
 
 export const state = {
     address: String | "0x0",
-    balance: ethers.utils.BigNumber | 0,
-    etherBalance: String | "0",
     user: {},
     loading: false
 };
@@ -26,10 +23,6 @@ const actions = {
             const signer = provider.getSigner()
             const address = await signer.getAddress()
             commit('setAddress', address)
-
-            const balance = await provider.getBalance(address)
-            commit('setBalance', balance)
-            commit('setEtherBalance', balance)
         }
     },
     async GetUser({ commit }) {
@@ -59,16 +52,8 @@ const mutations = {
         state.address = address;
     },
 
-    setBalance(state, balance) {
-        state.balance = balance;
-    },
-
-    setEtherBalance(state, balance) {
-        state.etherBalance = ethers.utils.formatEther(balance);
-    },
-
     setUser(state, data) {
-        state.user = { name: web3.utils.hexToUtf8(data.name), wallet_address: data.wallet_address, tips_received: data.tips_received.toNumber(), tips_sent: data.tips_sent.toNumber() }
+        state.user = { name: ethers.utils.toUtf8String(data.name), wallet_address: data.wallet_address }
     },
     setLoading(state, loading) {
         state.loading = loading

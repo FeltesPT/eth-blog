@@ -9,7 +9,7 @@
           </div>
           <span class="mx-2">-</span>
           <div class="text-blue-500">
-            Tips Received: {{ article.tips.toNumber() }}
+            Tips Received: {{ this.tips }} Eth
           </div>
         </figcaption>
         <p class="text-2xl font-semibold">
@@ -25,11 +25,15 @@
 </template>
 
 <script>
+import { ethers } from 'ethers';
 import Article from '../../store/models/Article'
 
 export default {
   props: {
     article: Article
-  }
+  },
+  computed: {
+    tips () { return ethers.utils.formatEther(this.article.tips.toString()) },
+  },
 };
 </script>

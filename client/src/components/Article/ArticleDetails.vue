@@ -3,6 +3,7 @@
     <h1 class="text-3xl text-white text-center">Loading...</h1>
   </div>
   <div v-else class="flex-col items-center justify-center container mx-auto mt-10 space-y-10">
+    <!-- Buttons -->
     <div class="flex justify-between">
       <button type="button" @click="$router.go(-1)" class="bg-blue-400 text-white px-6 py-1">
         <span class="text-lg">Back</span>
@@ -16,6 +17,7 @@
         </button>
       </div>
     </div>
+    <!-- Article Banner and Details -->
     <img class="w-full max-h-96" :src="'https://ipfs.infura.io/ipfs/' + article.imageHash" alt="Article Banner">
     <figcaption class="font-medium">
       <div class="text-gray-500">
@@ -28,33 +30,43 @@
         Published: {{ article.published ? "Yes" : "No" }}
       </div>
       <div class="text-gray-500">
-        Article Tips: {{ article.tips.toNumber() }}
+        Article Tips: {{ tips }}
       </div>
     </figcaption>
+    <!-- Article Title and Body -->
     <div v-if="!loading" class="space-y-2">
       <p class="text-2xl font-semibold">
         {{ article.title }}
       </p>
       <p><span v-html="article.content"></span></p>
     </div>
+    <!-- Article Footer and Tip -->
+    <div v-if="!isOwner">
+      <button type="button" @click="tipArticle" class="bg-blue-400 text-white px-6 py-1">
+        <span class="text-lg">Tip Article</span>
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 import web3 from 'web3'
+import { ethers } from 'ethers';
 import { mapActions } from "vuex";
 import Article from '../../store/models/Article'
 export default {
   name: "Article List",
   data() {
     return {
-      articles: Article,
+      article: Article,
       loading: true
     }
   },
   computed: {
-    address: function() { return this.$store.getters.accountAddress },
-    contract: function() { return this.$store.getters.readContract },
+    address () { return this.$store.getters.accountAddress },
+    contract () { return this.$store.getters.readContract },
+    isOwner () { return this.address === this.article.author },
+    tips () { return this.article !== undefined ? ethers.utils.formatEther(this.article.tips.toString()) : 0 },
   },
   mounted() {
     this.article = null
@@ -96,12 +108,25 @@ export default {
       const result = await txResponse.wait()
 
       if (result.status == 1) {
-        // Show Success
+        this.getArticle()
       } else {
         // Show Error
       }
+    },
+    async tipArticle() {
+      let tipAmount = ethers.utils.parseEther("0.1")
 
-      this.getArticle()
+      const txResponse = await this.$store.getters.writeContract.tipArticle(this.article.id, { value: tipAmount })
+      const result = await txResponse.wait()
+
+
+      console.log(result)
+
+      if (result.status == 1) {
+        this.getArticle()
+      } else {
+        // Show Error
+      }
     }
   },
 };
