@@ -37,6 +37,9 @@ const actions = {
             const author = await contract.users(article.author)
             article.authorName = ethers.utils.toUtf8String(author.name)
 
+            const comments = await contract.getArticleComments(article.id)
+            article.comments = comments
+            
             art.push(article)
         }
 
@@ -54,6 +57,9 @@ const actions = {
     
             const author = await contract.users(article.author)
             article.authorName = ethers.utils.toUtf8String(author.name)
+
+            const comments = await contract.getArticleComments(article.id)
+            article.comments = comments
 
             art.push(article)
         }

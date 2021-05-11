@@ -26,9 +26,8 @@ export default {
     this.load()
   },
   methods: {
-    ...mapActions(['GetAddress', 'GetUser']),
+    ...mapActions(['GetUser']),
     async load() {
-      await this.GetAddress()
       await this.GetUser()
     },
   }

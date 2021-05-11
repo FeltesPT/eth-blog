@@ -22,21 +22,31 @@ const actions = {
             await window.ethereum.request({ method: 'eth_requestAccounts' })
             const signer = provider.getSigner()
             const address = await signer.getAddress()
+            console.log('address: ', address);
             commit('setAddress', address)
         }
     },
     async GetUser({ commit }) {
-        const contract = new ethers.Contract(CONTRACT_ADDRESS, Blog.abi, provider)
-        try {
+        if (typeof window.ethereum !== 'undefined') {
+            await window.ethereum.request({ method: 'eth_requestAccounts' })
             const signer = provider.getSigner()
             const address = await signer.getAddress()
-            const data = await contract.users(address)
-            if (data.name) {
-                commit('setUser', data)
+            commit('setAddress', address)
+
+            const contract = new ethers.Contract(CONTRACT_ADDRESS, Blog.abi, provider)
+            
+            try {
+                const data = await contract.users(address)
+                if (data.wallet_address === address) {
+                    commit('setUser', data)
+                }
+            } catch (err) {
+                console.error(err);
             }
-        } catch (err) {
-            console.error(err);
         }
+
+
+        
     },
     async CreateUser({commit}, name) {
         commit('setLoading', true)

@@ -46,6 +46,14 @@
         <span class="text-lg">Tip Article</span>
       </button>
     </div>
+    <!-- Comment section -->
+    <div class="flex-col">
+      <h2 class="text-left text-2xl" for="title">Comments:</h2>
+      <div v-for="comment in article.comments" :key="comment.id">
+        <CommentCell :comment="comment" />
+      </div>
+      <CreateComment :articleId="article.id"/>
+    </div>
   </div>
 </template>
 
@@ -54,8 +62,16 @@ import web3 from 'web3'
 import { ethers } from 'ethers';
 import { mapActions } from "vuex";
 import Article from '../../store/models/Article'
+import Comment from '../../store/models/Comment'
+import CreateComment from '../../components/Comment/CreateComment'
+import CommentCell from '../../components/Comment/CommentCell'
+
 export default {
   name: "Article List",
+  components: {
+    CreateComment,
+    CommentCell
+  },
   data() {
     return {
       article: Article,
@@ -64,7 +80,6 @@ export default {
   },
   computed: {
     address () { return this.$store.getters.accountAddress },
-    contract () { return this.$store.getters.readContract },
     isOwner () { return this.address === this.article.author },
     tips () { return this.article !== undefined ? ethers.utils.formatEther(this.article.tips.toString()) : 0 },
   },
@@ -74,7 +89,7 @@ export default {
     this.load()
   },
   methods: {
-    ...mapActions(["LoadContracts","GetAddress"]),
+    ...mapActions(["LoadContracts"]),
     async load() {
       await this.LoadContracts()
       await this.getArticle()
@@ -84,6 +99,19 @@ export default {
 
       const json = await this.$store.getters.readContract.getArticle(this.$route.params.id);
       this.article = new Article(json)
+      const comments = await this.$store.getters.readContract.getArticleComments(this.article.id)
+      this.article.comments = []
+
+      for(var i = 0; i < comments.length; i++) {
+          const comment = new Comment(comments[i])
+          const author = await this.$store.getters.readContract.users(comment.author)
+          comment.authorName = ethers.utils.toUtf8String(author.name)
+
+          this.article.comments.push(comment)
+      }
+
+
+      console.log(this.article.comments)
 
       const author = await this.$store.getters.readContract.users(this.article.author)
       this.article.authorName = web3.utils.hexToUtf8(author.name)

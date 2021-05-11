@@ -102,19 +102,15 @@ export default {
     }
   },
   computed: {
-    address () { return this.$store.getters.accountAddress },
-    contract () { return this.$store.getters.readContract },
     ipfs () { return ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) }, // leaving out the arguments will default to these values
     tinymceKey() { return process.env.VUE_APP_TINYMCE_API_KEY }
   },
   mounted() {
-    console.log(this.tinymceKey);
     this.load()
   },
   methods: {
-    ...mapActions(["LoadContracts", "GetAddress"]),
+    ...mapActions(["LoadContracts"]),
     async load() {
-      await this.GetAddress()
       await this.LoadContracts()
 
       this.loading = false

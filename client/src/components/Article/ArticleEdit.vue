@@ -115,9 +115,8 @@ export default {
     this.load()
   },
   methods: {
-    ...mapActions(["LoadContracts", "GetAddress"]),
+    ...mapActions(["LoadContracts"]),
     async load() {
-      await this.GetAddress()
       await this.LoadContracts()
       await this.getArticle()
     },
