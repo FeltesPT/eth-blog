@@ -20,14 +20,27 @@ contract Blog {
     uint tips;
   }
 
+  struct Comment {
+    uint id;
+    uint16 articleId;
+    string message;
+    address payable author;
+    uint tips;
+    uint date;
+  }
+
   uint16 public articleCount = 0;
+  uint public commentCount = 0;
   Article[] private articles;
+  Comment[] private comments;
 
   mapping(address => User) public users;
-  mapping(uint => address) public articleToUser;
+  mapping(uint16 => address) public articleToUser;
   mapping(address => uint) public userArticlesCount;
+  mapping(uint => uint16) public commentToArticle;
+  mapping(uint16 => uint16) public articleCommentsCount;
 
-   event UserCreated(
+  event UserCreated(
     bytes32 name,
     address wallet_address,
     uint tips_received,
@@ -60,6 +73,15 @@ contract Blog {
     uint16 id,
     uint date,
     bool published
+  );
+
+  event CommentCreated (
+    uint id,
+    uint16 articleId,
+    string message,
+    address payable author,
+    uint tips,
+    uint date
   );
 
   constructor() {
@@ -156,11 +178,11 @@ contract Blog {
       }
 
       Article[] memory _myArticles = new Article[](_myCount);
-      for(uint i = 0; i < _articles.length; i++) {
-        _myArticles[i] = articles[i];
+      for(uint i = 0; i < _myCount; i++) {
+        _myArticles[i] = _articles[i];
       }
 
-      return _articles;
+      return _myArticles;
   }
 
   function togglePublished(uint16 _id) external articleExists(_id) isOwner(_id) {
@@ -215,6 +237,56 @@ contract Blog {
     User memory _tipper = users[msg.sender];
     _tipper.tips_sent = _tipper.tips_sent + msg.value;
     users[msg.sender] = _tipper;
+  }
+
+  // Comments methods
+  function addCommentToArticle(uint16 _articleId, string memory _message) external articleExists(_articleId) userExists(msg.sender) {
+    comments.push(Comment(commentCount, _articleId, _message, payable(msg.sender), 0, block.timestamp));
+
+    commentToArticle[commentCount] = _articleId;
+    articleCommentsCount[_articleId] = articleCommentsCount[_articleId] + 1;
+
+    // Emit Event here
+    emit CommentCreated(commentCount, _articleId, _message, payable(msg.sender), 0, comments[commentCount].date);
+    commentCount++;
+  }
+
+  function getArticleComments(uint16 _articleId) external view returns(Comment[] memory) {
+    Comment[] memory _comments = new Comment[](commentCount);
+
+    uint _articleCommentsCount = 0;
+    for (uint i = 0; i < commentCount; i++) {
+      if (comments[i].articleId == _articleId) {
+        _comments[i] = comments[i];
+        _articleCommentsCount++;
+      }
+    }
+
+    Comment[] memory _articleComments = new Comment[](_articleCommentsCount);
+    for (uint i = 0; i < _articleCommentsCount; i++) {
+      _articleComments[i] = _comments[i];
+    }
+
+    return _articleComments;
+  }
+
+  function getUserComments() external view returns(Comment[] memory) {
+    Comment[] memory _comments = new Comment[](commentCount);
+
+    uint _userCommentsCount = 0;
+    for (uint i = 0; i < commentCount; i++) {
+      if (comments[i].author == msg.sender) {
+        _comments[i] = comments[i];
+        _userCommentsCount++;
+      }
+    }
+
+    Comment[] memory _userComments = new Comment[](_userCommentsCount);
+    for (uint i = 0; i < _userCommentsCount; i++) {
+      _userComments[i] = _comments[i];
+    }
+
+    return _userComments;
   }
 
 }

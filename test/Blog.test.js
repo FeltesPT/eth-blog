@@ -6,7 +6,7 @@ require('chai')
   .use(require('chai-as-promised'))
   .should()
 
-contract('Blog', ([deployer, author1, author2]) => {
+contract('Blog', ([deployer, author1, author2, user1]) => {
 
   before(async () => {
     this.blog = await Blog.deployed()
@@ -258,6 +258,37 @@ contract('Blog', ([deployer, author1, author2]) => {
       const articles = await this.blog.getArticles()
       const article = articles[0]
       await this.blog.editArticle(article.id, "Totally Different Title", secondImageHash, "Totally Different Content", { from: author2 }).should.be.rejected
+    })
+  })
+
+  // Comments
+  describe('Comments', async () => {
+    it('Comment first article as the author', async () => {
+      const result = await this.blog.addCommentToArticle(0, "This is a basic comment", { from: deployer })
+      const event = result.logs[0].args
+      
+      assert.equal(event.id.toNumber(), 0, "[Wrong Comment ID]")
+      assert.equal(event.articleId.toNumber(), 0, "[Wrong Comment's Article ID]")
+      assert.equal(event.message, "This is a basic comment", "[Wrong comment message]")
+      assert.equal(event.author, deployer, "[Wrong Comment author]")
+      assert.equal(event.tips, 0, "[Wrong Tips amoung]")
+      assert.notEqual(event.date.toNumber(), null, "[Comment has no date]")
+    })
+
+    it('Comment first article as another user', async () => {
+      const result = await this.blog.addCommentToArticle(0, "This is a basic comment", { from: author1 })
+      const event = result.logs[0].args
+      
+      assert.equal(event.id.toNumber(), 1, "[Wrong Comment ID]")
+      assert.equal(event.articleId.toNumber(), 0, "[Wrong Comment's Article ID]")
+      assert.equal(event.message, "This is a basic comment", "[Wrong comment message]")
+      assert.equal(event.author, author1, "[Wrong Comment author]")
+      assert.equal(event.tips, 0, "[Wrong Tips amoung]")
+      assert.notEqual(event.date.toNumber(), null, "[Comment has no date]")
+    })
+
+    it('Comment not registered user should fail', async () => {
+      await this.blog.addCommentToArticle(0, "This is a basic comment", { from: user1 }).should.be.rejected
     })
   })
 })
