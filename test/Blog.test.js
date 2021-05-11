@@ -290,5 +290,24 @@ contract('Blog', ([deployer, author1, author2, user1]) => {
     it('Comment not registered user should fail', async () => {
       await this.blog.addCommentToArticle(0, "This is a basic comment", { from: user1 }).should.be.rejected
     })
+
+    it('Get user comments', async () => {
+      const deployerComments = await this.blog.getUserComments({from: deployer})
+      assert.equal(deployerComments.length, 1, "[deployer should have 1 comment]")
+
+      const authorComments = await this.blog.getUserComments({from: author1})
+      assert.equal(authorComments.length, 1, "[author1 should have 1 comment]")
+
+      const userComments = await this.blog.getUserComments({from: user1})
+      assert.equal(userComments.length, 0, "[User1 shouldn't have any comments]")
+    })
+
+    it('Get Article comments', async () => {
+      const firstArticleComments = await this.blog.getArticleComments(0, {from: deployer})
+      assert.equal(firstArticleComments.length, 2, "[First Article should have 2 comments]")
+
+      const secondArticleComments = await this.blog.getArticleComments(1, {from: deployer})
+      assert.equal(secondArticleComments.length, 0, "[Second Article should have 0 comments]")
+    })
   })
 })
