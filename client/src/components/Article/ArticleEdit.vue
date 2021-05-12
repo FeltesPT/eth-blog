@@ -171,8 +171,6 @@ export default {
         return
       }
 
-      console.log("Saving article...");
-
       const txResponse = await this.$store.getters.writeContract.editArticle(this.article.id, this.article.title, this.article.imageHash, this.article.content)
       const result = await txResponse.wait()
 

@@ -103,11 +103,11 @@ export default {
       this.article.comments = []
 
       for(var i = 0; i < comments.length; i++) {
-          const comment = new Comment(comments[i])
-          const author = await this.$store.getters.readContract.users(comment.author)
-          comment.authorName = ethers.utils.toUtf8String(author.name)
+        const comment = new Comment(comments[i])
+        const author = await this.$store.getters.readContract.users(comment.author)
+        comment.authorName = ethers.utils.toUtf8String(author.name)
 
-          this.article.comments.push(comment)
+        this.article.comments.push(comment)
       }
 
       const author = await this.$store.getters.readContract.users(this.article.author)
@@ -143,9 +143,6 @@ export default {
 
       const txResponse = await this.$store.getters.writeContract.tipArticle(this.article.id, { value: tipAmount })
       const result = await txResponse.wait()
-
-
-      console.log(result)
 
       if (result.status == 1) {
         this.getArticle()
