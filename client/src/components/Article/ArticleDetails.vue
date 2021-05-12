@@ -110,9 +110,6 @@ export default {
           this.article.comments.push(comment)
       }
 
-
-      console.log(this.article.comments)
-
       const author = await this.$store.getters.readContract.users(this.article.author)
       this.article.authorName = web3.utils.hexToUtf8(author.name)
 
