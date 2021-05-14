@@ -7,14 +7,17 @@ const provider = new ethers.providers.Web3Provider(window.ethereum)
 export const state = {
     address: String | "0x0",
     user: {},
-    loading: false
+    loading: false,
+    owner: ethers.address
 };
 const getters = {
     accountAddress: (state) => state.address,
     accountBalance: (state) => state.balance,
     accountEthBalance: (state) => state.etherBalance,
     user: (state) => state.user,
-    loading: (state) => state.loading
+    loading: (state) => state.loading,
+    owner: (state) => state.owner,
+    isOwner: (state) => state.owner === state.user.wallet_address
 };
 const actions = {
     async GetAddress({ commit }) {
@@ -40,13 +43,12 @@ const actions = {
                 if (data.wallet_address === address) {
                     commit('setUser', data)
                 }
+                const owner = await contract.owner()
+                commit('setOwner', owner)     
             } catch (err) {
                 console.error(err);
             }
-        }
-
-
-        
+        }   
     },
     async CreateUser({commit}, name) {
         commit('setLoading', true)
@@ -67,6 +69,9 @@ const mutations = {
     },
     setLoading(state, loading) {
         state.loading = loading
+    },
+    setOwner(state, owner) {
+        state.owner = owner;
     }
 };
 export default {

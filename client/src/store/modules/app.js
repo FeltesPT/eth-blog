@@ -9,12 +9,12 @@ const provider = new ethers.providers.Web3Provider(window.ethereum)
 export const state = {
     writeContract: ethers.contract,
     contract: ethers.contract,
-    articles: ethers.articles,
+    articles: []
 };
 const getters = {
     readContract: (state) => state.contract,
     writeContract: (state) => state.writeContract,
-    articles: (state) => state.articles,
+    articles: (state) => state.articles
 };
 const actions = {
     async LoadContracts({commit}) {

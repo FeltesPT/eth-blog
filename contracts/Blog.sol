@@ -29,7 +29,7 @@ contract Blog {
     uint date;
   }
 
-  address payable owner;
+  address payable public owner;
   uint16 public articleCount = 0;
   uint public commentCount = 0;
   Article[] private articles;

@@ -18,9 +18,7 @@ export default {
     CreateUser
   },
   computed: {
-    user: function() { 
-      return this.$store.getters.user
-    },
+    user () {  return this.$store.getters.user }
   },
   mounted() {
     this.load()

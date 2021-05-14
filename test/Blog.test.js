@@ -22,6 +22,11 @@ contract('Blog', ([deployer, user1, user2, user3]) => {
       assert.notEqual(address, undefined, "[Blog contract address is undefined]")
     })
 
+    it('Owner is deployer', async () => {
+      const owner = await this.blog.owner()
+      assert.equal(owner, deployer, "[Owner is not deployer]")
+    })
+
     it('creates user', async () => {
       const user = await this.blog.users(deployer)
       assert.equal(web3.utils.hexToUtf8(user.name), "Tiago Dias", "[User is not correct]")
