@@ -8,7 +8,7 @@
         <router-link class="mr-4 my-auto" :to="{ name: 'Profile'}">
           <p>{{ user.name.length > 0 ? user.name : user.wallet_address }}</p>
         </router-link>
-        <div class="my-auto">
+        <div v-if="isOwner" class="my-auto">
           <button type="button" @click="$router.push({ path: 'create' })" class="bg-blue-400 text-white px-6 py-1">
             <span class="text-lg">Write</span>
           </button>
@@ -20,8 +20,12 @@
 
 <script>
 export default {
+  name: 'Home',
   props: {
-    user: {}
+    user: {},
+  },
+  computed: {
+    isOwner () {  return this.$store.getters.isOwner }
   }
-};
+}
 </script>

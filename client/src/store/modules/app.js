@@ -9,12 +9,12 @@ const provider = new ethers.providers.Web3Provider(window.ethereum)
 export const state = {
     writeContract: ethers.contract,
     contract: ethers.contract,
-    articles: ethers.articles,
+    articles: []
 };
 const getters = {
     readContract: (state) => state.contract,
     writeContract: (state) => state.writeContract,
-    articles: (state) => state.articles,
+    articles: (state) => state.articles
 };
 const actions = {
     async LoadContracts({commit}) {
@@ -37,6 +37,9 @@ const actions = {
             const author = await contract.users(article.author)
             article.authorName = ethers.utils.toUtf8String(author.name)
 
+            const comments = await contract.getArticleComments(article.id)
+            article.comments = comments
+            
             art.push(article)
         }
 
@@ -54,6 +57,9 @@ const actions = {
     
             const author = await contract.users(article.author)
             article.authorName = ethers.utils.toUtf8String(author.name)
+
+            const comments = await contract.getArticleComments(article.id)
+            article.comments = comments
 
             art.push(article)
         }

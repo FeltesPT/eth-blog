@@ -2,14 +2,15 @@
   <router-link :to="{ name: 'Details', params: { id: article.id }}">
     <figure class="flex justify-between my-10 max-h-48 border-2 border-gray-400 p-4 bg-white">
       <div class="flex-col text-center md:text-left space-y-2 w-full">
-        <figcaption class="flex text-xs">
-          <span class="mr-2">Writer: </span>
+        <figcaption class="flex-col text-xs">
           <div class="text-blue-500">
-            {{ article.authorName }}
+            Writer: {{ article.authorName }}
           </div>
-          <span class="mx-2">-</span>
           <div class="text-blue-500">
-            Tips Received: {{ this.tips }} Eth
+            Tips: {{ this.tips }} Eth
+          </div>
+          <div class="text-blue-500">
+            Comments: {{ article.comments.length }}
           </div>
         </figcaption>
         <p class="text-2xl font-semibold">

@@ -30,10 +30,9 @@ export default {
     this.load()
   },
   methods: {
-    ...mapActions(["LoadContracts","GetAddress", 'GetMyArticles']),
+    ...mapActions(["LoadContracts", 'GetMyArticles']),
     async load() {
       await this.LoadContracts()
-      await this.GetAddress()
       await this.GetMyArticles()
     },
   },
